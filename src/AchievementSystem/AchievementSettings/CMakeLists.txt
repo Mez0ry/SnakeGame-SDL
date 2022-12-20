@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+
+set(AchievementSettings_Sources AchievementSettings.cpp)
+set(AchievementSettings_Headers AchievementSettings.hpp)
+
+add_executable(AchievementSettings ${AchievementSettings_Sources} ${AchievementSettings_Headers})
+target_include_directories(AchievementSettings PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(AchievementSettings AchievementSystem)
+
+set_target_properties(AchievementSettings PROPERTIES LINKER_LANGUAGE CXX)
