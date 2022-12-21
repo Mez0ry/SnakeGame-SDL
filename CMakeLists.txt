@@ -2,8 +2,13 @@ cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 set(ProjectName SnakeGameSDL)
 
+project(${ProjectName})
+
 set(RootSources src/main.cpp src/Map.cpp src/Game.cpp)
 set(RootHeaders src/Map.hpp src/Game.hpp)
+
+message("Root SOURCES: ${RootSources}\n")
+message("Root HEADERS: ${RootHeaders}\n")
 
 add_executable(${ProjectName} ${RootSources} ${RootHeaders})
 
@@ -24,7 +29,7 @@ add_subdirectory(src/SpriteAnimation)
 add_subdirectory(src/TextureManager)
 add_subdirectory(src/Timer)
 
-#Vendor
+##Vendor
 set(SDL_STATIC ON CACHE BOOL "" FORCE)
 set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 
@@ -37,7 +42,7 @@ target_link_libraries(${ProjectName} SDL_image)
 add_subdirectory(vendor/SDL_ttf)
 target_link_libraries(${ProjectName} SDL_ttf)
 
+set(SDL2MIXER_VENDORED ON CACHE BOOL "" FORCE)
+
 add_subdirectory(vendor/SDL_mixer)
 target_link_libraries(${ProjectName} SDL_mixer)
-
- 
