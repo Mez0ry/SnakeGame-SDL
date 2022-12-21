@@ -11,6 +11,7 @@
 #include "SnakeStates/SnakeStatesController.hpp"
 /** SnakeBody*/
 #include "SnakeBody.hpp"
+
 #include "../SpriteAnimation/SpriteAnimation.hpp"
 
 class Snake : public Entity {
@@ -40,7 +41,5 @@ public:
 private:
   SDL_Event m_event;
   SnakeBody m_SnakeBody;
-  SpriteAnimation m_PoisonAnimation;
-  TextureManager m_PoisonTexture;
 };
 #endif //! SnakeGame_SNAKE_HPP
