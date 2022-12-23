@@ -1,6 +1,6 @@
-#include "CStats.hpp"
+#include "CMatchHistory.hpp"
 
-CStats::CStats()
+CMatchHistory::CMatchHistory()
 {
     const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
     std::string texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "Other" + symbol + "buttons" + symbol + "return_button.png";
@@ -42,24 +42,24 @@ CStats::CStats()
     m_DataFieldTexture.set_srcRect(0, 0, 520, 172);
 }
 
-CStats::~CStats()
+CMatchHistory::~CMatchHistory()
 {
 }
 
-void CStats::OnCreate()
+void CMatchHistory::OnCreate()
 {
 }
 
-void CStats::BeforeDestruction()
+void CMatchHistory::BeforeDestruction()
 {
 }
 
-void CStats::OnDestroy()
+void CMatchHistory::OnDestroy()
 {
     m_ReturnButton.DestroyTexture();
 }
 
-void CStats::InputHandler()
+void CMatchHistory::InputHandler()
 {
     while (SDL_PollEvent(&m_event) != 0)
     {
@@ -128,7 +128,7 @@ void CStats::InputHandler()
     } //! SDL_PollEvent
 }
 
-void CStats::Update()
+void CMatchHistory::Update()
 {
     if (m_InertialScrollModel.scrolling)
     {
@@ -148,7 +148,7 @@ void CStats::Update()
 
 }
 
-void CStats::Render()
+void CMatchHistory::Render()
 {
     m_BackgroundTexture.DestroyTexture();
     m_BackgroundTexture.ReloadTexture();
@@ -166,7 +166,7 @@ void CStats::Render()
 }
 
 template <typename std::size_t Row_Size, typename std::size_t Col_Size>
-constexpr int CStats::ClosestTextureResolution(int texture_resolution_arr[Row_Size][Col_Size], int row, int col)
+constexpr int CMatchHistory::ClosestTextureResolution(int texture_resolution_arr[Row_Size][Col_Size], int row, int col)
 {
     int window_width = CAppSettings::instance().get_WindowWidth();
     int window_height = CAppSettings::instance().get_WindowHeight();

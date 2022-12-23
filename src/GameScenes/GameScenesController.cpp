@@ -17,7 +17,7 @@ void GameScenesController::CollectScenes()
   AddScene(menu_scene);
   std::shared_ptr<CPause> pause_scene = std::make_shared<CPause>();
   AddScene(pause_scene);
-  std::shared_ptr<CStats> stats_scene = std::make_shared<CStats>();
+  std::shared_ptr<CMatchHistory> stats_scene = std::make_shared<CMatchHistory>();
   AddScene(stats_scene);
   std::shared_ptr<CExit> exit_scene = std::make_shared<CExit>();
   AddScene(exit_scene);
