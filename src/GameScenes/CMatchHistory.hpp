@@ -35,10 +35,12 @@ private:
     TextureManager m_ReturnButton;
     TextureManager m_BackgroundTexture;
     TextureManager m_DataFieldTexture;
-
+    TextureManager m_MatchBoardTexture;
+    
     InertialScrollModel m_InertialScrollModel;
 
 private:
+
 template < typename std::size_t Row_Size, typename std::size_t Col_Size>
 constexpr int ClosestTextureResolution(int texture_resolution_arr[Row_Size][Col_Size], int row, int col);
 };

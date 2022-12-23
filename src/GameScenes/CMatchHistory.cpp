@@ -4,6 +4,7 @@ CMatchHistory::CMatchHistory()
 {
     const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
     std::string texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "Other" + symbol + "buttons" + symbol + "return_button.png";
+    // Return button
     m_ReturnButton.LoadTexture(texture_path.c_str());
 
     int width = CAppSettings::instance().get_WindowWidth() / 26;
@@ -12,18 +13,22 @@ CMatchHistory::CMatchHistory()
     m_ReturnButton.set_dstRect(width, height, 72, 72);
     m_ReturnButton.set_srcRect(0, 0, 512, 512);
 
+    // background texture
     int background_texture_resolutions[2][2] = {{1920, 1080}, {800, 800}};
     int row_index = ClosestTextureResolution<2, 2>(background_texture_resolutions, 2, 2);
 
-    switch(row_index){
-        case 0:{
-            texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "background_match_history_1920x1080.png";
-            break;
-        }
-        case 1:{
-            texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "background_match_history_800x800.png";
-            break;
-        }
+    switch (row_index)
+    {
+    case 0:
+    {
+        texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "background_match_history_1920x1080.png";
+        break;
+    }
+    case 1:
+    {
+        texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "background_match_history_800x800.png";
+        break;
+    }
     }
 
     m_BackgroundTexture.LoadTexture(texture_path.c_str());
@@ -31,15 +36,33 @@ CMatchHistory::CMatchHistory()
 
     m_BackgroundTexture.set_srcRect(0, 0, background_texture_resolutions[row_index][0], background_texture_resolutions[row_index][1]);
 
+    // Match board texture
+    texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "match_board.png";
+    m_MatchBoardTexture.LoadTexture(texture_path.c_str());
+
+    int match_board_source_width = 583;
+    int match_board_source_height = 333;
+
+    m_MatchBoardTexture.set_srcRect(0, 0, match_board_source_width, match_board_source_height);
+
+    int match_board_posX = (CAppSettings::instance().get_WindowWidth() / 2) - (m_MatchBoardTexture.get_srcRect().w / 2);
+    int match_board_posY = (CAppSettings::instance().get_WindowHeight() / 2) - (m_MatchBoardTexture.get_srcRect().h / 2);
+
+    m_MatchBoardTexture.set_dstRect(match_board_posX, match_board_posY, match_board_source_width, match_board_source_height);
+
+    // Data field texture
     texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "data_field.png";
     m_DataFieldTexture.LoadTexture(texture_path.c_str());
 
-    m_DataFieldTexture.set_dstRect(CAppSettings::instance().get_WindowWidth() / 2 - 50, (CAppSettings::instance().get_WindowHeight() / 2) - 10, 300, 125);
+    int data_field_posX = match_board_posX + 5;
+    int data_field_posY = match_board_posY + 60;
 
-    int data_field_source_width = 520;
-    int data_field_source_height = 172;
-    
-    m_DataFieldTexture.set_srcRect(0, 0, 520, 172);
+    int data_field_source_width = 572;
+    int data_field_source_height = 30;
+
+    m_DataFieldTexture.set_dstRect(data_field_posX, data_field_posY, data_field_source_width, data_field_source_height);
+
+    m_DataFieldTexture.set_srcRect(0, 0, data_field_source_width, data_field_source_height);
 }
 
 CMatchHistory::~CMatchHistory()
@@ -145,7 +168,6 @@ void CMatchHistory::Update()
 
     if (abs(m_InertialScrollModel.scroll_acceleration) < 0.0005)
         m_InertialScrollModel.scroll_acceleration = 0, m_InertialScrollModel.scrolling = false, m_InertialScrollModel.scroll_y = 0;
-
 }
 
 void CMatchHistory::Render()
@@ -157,6 +179,10 @@ void CMatchHistory::Render()
     m_ReturnButton.DestroyTexture();
     m_ReturnButton.ReloadTexture();
     m_ReturnButton.RenderTexture();
+
+    m_MatchBoardTexture.DestroyTexture();
+    m_MatchBoardTexture.ReloadTexture();
+    m_MatchBoardTexture.RenderTexture();
 
     m_DataFieldTexture.AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
 
