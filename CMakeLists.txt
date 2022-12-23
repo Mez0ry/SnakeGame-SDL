@@ -20,7 +20,7 @@ set(FontManager src/FontManager/FontManager.hpp src/FontManager/FontManager.cpp)
 set(FoodFlyweight src/Food/FoodFlyweight/FoodFlyweight.hpp src/Food/FoodFlyweight/FoodFlyweight.cpp)
 set(Food src/Food/Food.hpp src/Food/Food.cpp ${FoodFlyweight})
 
-set(GameScenes src/GameScenes/CExit.hpp src/GameScenes/CExit.cpp src/GameScenes/CMenu.hpp src/GameScenes/CMenu.cpp src/GameScenes/CPause.hpp src/GameScenes/CPause.cpp  src/GameScenes/CPlaying.hpp src/GameScenes/CPlaying.cpp src/GameScenes/CStats.hpp src/GameScenes/CStats.cpp src/GameScenes/GameScene.hpp src/GameScenes/GameScenesController.hpp  src/GameScenes/GameScenesController.cpp)
+set(GameScenes src/GameScenes/CExit.hpp src/GameScenes/CExit.cpp src/GameScenes/CMenu.hpp src/GameScenes/CMenu.cpp src/GameScenes/CPause.hpp src/GameScenes/CPause.cpp  src/GameScenes/CPlaying.hpp src/GameScenes/CPlaying.cpp src/GameScenes/CMatchHistory.hpp src/GameScenes/CMatchHistory.cpp src/GameScenes/GameScene.hpp src/GameScenes/GameScenesController.hpp  src/GameScenes/GameScenesController.cpp)
 
 set(GameScore src/GameScore/GameScore.hpp src/GameScore/GameScore.cpp)
 

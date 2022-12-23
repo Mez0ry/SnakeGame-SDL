@@ -8,7 +8,7 @@
 #include "CMenu.hpp"
 #include "CPause.hpp"
 #include "CPlaying.hpp"
-#include "CStats.hpp"
+#include "CMatchHistory.hpp"
 
 class GameScenesController {
 private:

@@ -17,11 +17,11 @@ typedef struct InertialScrollModel
     double scroll_prev_pos;
 } InertialScrollModel;
 
-class CStats : public GameScene
+class CMatchHistory : public GameScene
 {
 public:
-    CStats();
-    ~CStats();
+    CMatchHistory();
+    ~CMatchHistory();
 
     void OnCreate() override;
     void BeforeDestruction() override;
