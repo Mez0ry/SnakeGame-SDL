@@ -46,7 +46,7 @@ CMatchHistory::CMatchHistory()
     m_MatchBoardTexture.set_srcRect(0, 0, match_board_source_width, match_board_source_height);
 
     int match_board_posX = (CAppSettings::instance().get_WindowWidth() / 2) - (m_MatchBoardTexture.get_srcRect().w / 2);
-    int match_board_posY = (CAppSettings::instance().get_WindowHeight() / 2) - (m_MatchBoardTexture.get_srcRect().h / 2);
+    int match_board_posY = (CAppSettings::instance().get_WindowHeight() / 2) - (m_MatchBoardTexture.get_srcRect().h / 2) + 40;
 
     m_MatchBoardTexture.set_dstRect(match_board_posX, match_board_posY, match_board_source_width, match_board_source_height);
 
