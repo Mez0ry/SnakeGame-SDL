@@ -4,6 +4,7 @@ CMatchHistory::CMatchHistory()
 {
     const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
     std::string texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "Other" + symbol + "buttons" + symbol + "return_button.png";
+
     // Return button
     m_ReturnButton.LoadTexture(texture_path.c_str());
 
@@ -63,6 +64,9 @@ CMatchHistory::CMatchHistory()
     m_DataFieldTexture.set_dstRect(data_field_posX, data_field_posY, data_field_source_width, data_field_source_height);
 
     m_DataFieldTexture.set_srcRect(0, 0, data_field_source_width, data_field_source_height);
+
+    m_range.top = data_field_posY - 10;
+    m_range.bottom = (data_field_posY + m_MatchBoardTexture.get_srcRect().h) - 110;
 }
 
 CMatchHistory::~CMatchHistory()
@@ -163,6 +167,7 @@ void CMatchHistory::Update()
 
         if (abs(m_InertialScrollModel.scroll_acceleration) < 0.0005)
             m_InertialScrollModel.scroll_acceleration = 0;
+
         m_InertialScrollModel.scroll_y += m_InertialScrollModel.scroll_sensitivity * m_InertialScrollModel.scroll_acceleration;
     }
 
@@ -184,7 +189,14 @@ void CMatchHistory::Render()
     m_MatchBoardTexture.ReloadTexture();
     m_MatchBoardTexture.RenderTexture();
 
-    m_DataFieldTexture.AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
+    if (m_InertialScrollModel.scroll_y > 0 && m_DataFieldTexture.get_dstRect().y + m_InertialScrollModel.scroll_y < m_range.bottom)
+    {
+        m_DataFieldTexture.AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
+    }
+    else if (m_InertialScrollModel.scroll_y < 0 && m_DataFieldTexture.get_dstRect().y + m_InertialScrollModel.scroll_y > m_range.top)
+    {
+        m_DataFieldTexture.AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
+    }
 
     m_DataFieldTexture.DestroyTexture();
     m_DataFieldTexture.ReloadTexture();
