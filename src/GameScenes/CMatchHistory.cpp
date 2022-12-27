@@ -160,34 +160,12 @@ void CMatchHistory::InputHandler()
         {
             if (m_event.wheel.preciseY > 0)
             {
-                if (m_InertialScrollModel.scrolling == 0)
-                {
-                    m_InertialScrollModel.scrolling = 1;
-                    m_InertialScrollModel.scroll_prev_pos = m_event.wheel.y;
-                }
-                else
-                {
-                    double dy = (m_event.wheel.y - m_InertialScrollModel.scroll_prev_pos) + 0.2;
-                    m_InertialScrollModel.scroll_acceleration = dy * 30;
-                    m_InertialScrollModel.scroll_prev_pos = m_event.wheel.y;
-                    m_InertialScrollModel.scrolling = 1;
-                }
+                m_InertialScroll.CalculateAcceleration(true);
             }
 
             if (m_event.wheel.preciseY < 0)
             {
-                if (m_InertialScrollModel.scrolling == 0)
-                {
-                    m_InertialScrollModel.scrolling = 1;
-                    m_InertialScrollModel.scroll_prev_pos = m_event.wheel.y;
-                }
-                else
-                {
-                    double dy = (m_event.wheel.y - m_InertialScrollModel.scroll_prev_pos) - 0.2;
-                    m_InertialScrollModel.scroll_acceleration = dy * 30;
-                    m_InertialScrollModel.scroll_prev_pos = m_event.wheel.y;
-                    m_InertialScrollModel.scrolling = 1;
-                }
+                 m_InertialScroll.CalculateAcceleration(false);
             }
         }
 
@@ -203,26 +181,11 @@ void CMatchHistory::InputHandler()
 
 void CMatchHistory::Update()
 {
-    if (m_InertialScrollModel.scrolling)
-    {
-        if (m_InertialScrollModel.scroll_acceleration > 0)
-            m_InertialScrollModel.scroll_acceleration -= m_InertialScrollModel.scroll_friction;
-
-        if (m_InertialScrollModel.scroll_acceleration < 0)
-            m_InertialScrollModel.scroll_acceleration += m_InertialScrollModel.scroll_friction;
-
-        if (abs(m_InertialScrollModel.scroll_acceleration) < 0.0005)
-            m_InertialScrollModel.scroll_acceleration = 0;
-
-        m_InertialScrollModel.scroll_y += m_InertialScrollModel.scroll_sensitivity * m_InertialScrollModel.scroll_acceleration;
-    }
-
-    if (abs(m_InertialScrollModel.scroll_acceleration) < 0.0005)
-        m_InertialScrollModel.scroll_acceleration = 0, m_InertialScrollModel.scrolling = false, m_InertialScrollModel.scroll_y = 0;
+   m_InertialScroll.Decelerate();
 
     for (int i = 0; i < m_FieldsSize; i++)
     {
-        m_DataFields[i].get_Texture().AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
+        m_DataFields[i].get_Texture().AdditionAssignmentToDstRect(0, m_InertialScroll.get_Model().scroll_y, 0, 0);
         m_DataFields[i].Update();
     }
 }

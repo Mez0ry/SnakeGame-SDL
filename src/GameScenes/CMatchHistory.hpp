@@ -10,7 +10,6 @@
 #include "ScenesUtils/InertialScroll/InertialScroll.hpp"
 #include <queue>
 
-
 class CMatchHistory : public GameScene
 {
 public:
@@ -28,19 +27,16 @@ public:
 private:
     TextureManager m_ReturnButton;
     TextureManager m_BackgroundTexture;
-    TextureManager m_DataFieldTexture[2];
     TextureManager m_MatchBoardTexture;
 
-    InertialScrollModel m_InertialScrollModel;
-
-    DataField* m_DataFields;
+    InertialScroll m_InertialScroll;
+    DataField *m_DataFields;
     std::queue<int> m_ScoreQueue;
-  
-    int m_FieldsSize = 0;
-private:
 
-    
-template < typename std::size_t Row_Size, typename std::size_t Col_Size>
-constexpr int ClosestTextureResolution(int texture_resolution_arr[Row_Size][Col_Size], int row, int col);
+    int m_FieldsSize = 0;
+
+private:
+    template <typename std::size_t Row_Size, typename std::size_t Col_Size>
+    constexpr int ClosestTextureResolution(int texture_resolution_arr[Row_Size][Col_Size], int row, int col);
 };
 #endif //! SnakeGame_GameScenes_CSTATS_HPP
