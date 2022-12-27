@@ -50,23 +50,6 @@ CMatchHistory::CMatchHistory()
     int match_board_posY = (CAppSettings::instance().get_WindowHeight() / 2) - (m_MatchBoardTexture.get_srcRect().h / 2) + 40;
 
     m_MatchBoardTexture.set_dstRect(match_board_posX, match_board_posY, match_board_source_width, match_board_source_height);
-
-    // Data field texture
-    texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "data_field.png";
-    m_DataFieldTexture.LoadTexture(texture_path.c_str());
-
-    int data_field_posX = match_board_posX + 5;
-    int data_field_posY = match_board_posY + 60;
-
-    int data_field_source_width = 572;
-    int data_field_source_height = 30;
-
-    m_DataFieldTexture.set_dstRect(data_field_posX, data_field_posY, data_field_source_width, data_field_source_height);
-
-    m_DataFieldTexture.set_srcRect(0, 0, data_field_source_width, data_field_source_height);
-
-    m_range.top = data_field_posY - 10;
-    m_range.bottom = (data_field_posY + m_MatchBoardTexture.get_srcRect().h) - 110;
 }
 
 CMatchHistory::~CMatchHistory()
@@ -75,15 +58,78 @@ CMatchHistory::~CMatchHistory()
 
 void CMatchHistory::OnCreate()
 {
+    const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
+    std::string file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "score_history.cfg";
+
+    std::ifstream istrm(file_path, std::ios::out);
+    if (!istrm.is_open())
+    {
+        std::cerr << "Failed to open  'Score history' config file."
+                  << " "
+                  << "score history config path: " << file_path.c_str() << "\ncpp source filename: " << __FILENAME__;
+    }
+
+    std::string current_line;
+
+    while (getline(istrm, current_line, ';'))
+    {
+        m_ScoreStack.push(std::stoi(current_line));
+    }
+
+    istrm.close();
+
+    // Data fields
+    std::string texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "data_field.png";
+
+    int data_field_posX = (CAppSettings::instance().get_WindowWidth() / 2) - (m_MatchBoardTexture.get_srcRect().w / 2) + 5;
+    int data_field_posY = (CAppSettings::instance().get_WindowHeight() / 2) - (m_MatchBoardTexture.get_srcRect().h / 2) + 100;
+
+    int data_field_source_width = 572;
+    int data_field_source_height = 30;
+
+    int space_between_data_fields = 15;
+
+    if (m_DataFields == nullptr && !m_ScoreStack.empty())
+    {
+        m_DataFields = new DataField[m_ScoreStack.size()];
+        m_FieldsSize = m_ScoreStack.size();
+    }
+
+    for (int i = 0; i < m_FieldsSize; i++)
+    {
+        m_DataFields[i].LoadTexture(texture_path);
+        m_DataFields[i].set_Activity(true);
+
+        m_DataFields[i].get_DataModel().score = m_ScoreStack.top();
+
+        m_DataFields[i].get_Texture().set_dstRect(data_field_posX, data_field_posY + (i * (space_between_data_fields + data_field_source_height)), data_field_source_width, data_field_source_height);
+
+        m_DataFields[i].get_Texture().set_srcRect(0, 0, data_field_source_width, data_field_source_height);
+
+        m_ScoreStack.pop();
+       
+        m_DataFields[i].get_Range().top = data_field_posY - data_field_source_height;
+        m_DataFields[i].get_Range().bottom = (data_field_posY + m_MatchBoardTexture.get_srcRect().h) - 110;
+    }
 }
 
 void CMatchHistory::BeforeDestruction()
 {
+    
 }
 
 void CMatchHistory::OnDestroy()
 {
     m_ReturnButton.DestroyTexture();
+
+    m_ScoreStack = std::stack<int>();
+
+    if (m_DataFields != nullptr && m_FieldsSize)
+    {
+        delete[] m_DataFields;
+    }
+    m_DataFields = nullptr;
+    m_FieldsSize = 0;
 }
 
 void CMatchHistory::InputHandler()
@@ -112,7 +158,7 @@ void CMatchHistory::InputHandler()
 
         case SDL_MOUSEWHEEL:
         {
-            if (m_event.wheel.preciseY < 0)
+            if (m_event.wheel.preciseY > 0)
             {
                 if (m_InertialScrollModel.scrolling == 0)
                 {
@@ -128,7 +174,7 @@ void CMatchHistory::InputHandler()
                 }
             }
 
-            if (m_event.wheel.preciseY > 0)
+            if (m_event.wheel.preciseY < 0)
             {
                 if (m_InertialScrollModel.scrolling == 0)
                 {
@@ -173,6 +219,12 @@ void CMatchHistory::Update()
 
     if (abs(m_InertialScrollModel.scroll_acceleration) < 0.0005)
         m_InertialScrollModel.scroll_acceleration = 0, m_InertialScrollModel.scrolling = false, m_InertialScrollModel.scroll_y = 0;
+
+    for (int i = 0; i < m_FieldsSize; i++)
+    {
+        m_DataFields[i].get_Texture().AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
+        m_DataFields[i].Update();
+    }
 }
 
 void CMatchHistory::Render()
@@ -189,18 +241,28 @@ void CMatchHistory::Render()
     m_MatchBoardTexture.ReloadTexture();
     m_MatchBoardTexture.RenderTexture();
 
-    if (m_InertialScrollModel.scroll_y > 0 && m_DataFieldTexture.get_dstRect().y + m_InertialScrollModel.scroll_y < m_range.bottom)
+    for (int i = 0; i < 2; i++)
     {
-        m_DataFieldTexture.AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
+        // if (m_InertialScrollModel.scroll_y > 0 && m_DataFieldTexture[i].get_dstRect().y + m_InertialScrollModel.scroll_y < m_range.bottom)
+        // {
+        //     m_DataFieldTexture[i].AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
+        // }
+        // else if (m_InertialScrollModel.scroll_y < 0 && m_DataFieldTexture[i].get_dstRect().y + m_InertialScrollModel.scroll_y > m_range.top)
+        // {
+        //     m_DataFieldTexture[i].AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
+        // }
+        // m_DataFieldTexture[i].AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
+        // m_DataFieldTexture[i].DestroyTexture();
+        // m_DataFieldTexture[i].ReloadTexture();
+        // m_DataFieldTexture[i].RenderTexture();
     }
-    else if (m_InertialScrollModel.scroll_y < 0 && m_DataFieldTexture.get_dstRect().y + m_InertialScrollModel.scroll_y > m_range.top)
+    for (int i = 0; i < m_FieldsSize; i++)
     {
-        m_DataFieldTexture.AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
+        if (m_DataFields[i].isActive())
+        {
+            m_DataFields[i].Render();
+        }
     }
-
-    m_DataFieldTexture.DestroyTexture();
-    m_DataFieldTexture.ReloadTexture();
-    m_DataFieldTexture.RenderTexture();
 }
 
 template <typename std::size_t Row_Size, typename std::size_t Col_Size>

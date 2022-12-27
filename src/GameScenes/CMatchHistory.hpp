@@ -6,16 +6,10 @@
 #include "../FontManager/FontManager.hpp"
 #include "GameScene.hpp"
 #include <climits>
+#include "ScenesUtils/DataField/DataField.hpp"
+#include "ScenesUtils/InertialScroll/InertialScroll.hpp"
+#include <stack>
 
-typedef struct InertialScrollModel
-{
-    int scrolling;              // flag (scrolling or not)
-    int scroll_sensitivity = 5; // how fast we want to scroll
-    double scroll_y = 0;        // current scrolling amount (on Y-Axis)
-    double scroll_acceleration; // scrolling speed
-    double scroll_friction = 2; // how fast we decelerate
-    double scroll_prev_pos;
-} InertialScrollModel;
 
 class CMatchHistory : public GameScene
 {
@@ -34,15 +28,17 @@ public:
 private:
     TextureManager m_ReturnButton;
     TextureManager m_BackgroundTexture;
-    TextureManager m_DataFieldTexture;
+    TextureManager m_DataFieldTexture[2];
     TextureManager m_MatchBoardTexture;
 
     InertialScrollModel m_InertialScrollModel;
 
+    DataField* m_DataFields;
+    std::stack<int> m_ScoreStack;
+    std::stack<DataField*> m_InActiveDataFields;
+    int m_FieldsSize = 0;
 private:
-    struct Range{
-        int top, bottom;
-    } m_range;
+
     
 template < typename std::size_t Row_Size, typename std::size_t Col_Size>
 constexpr int ClosestTextureResolution(int texture_resolution_arr[Row_Size][Col_Size], int row, int col);
