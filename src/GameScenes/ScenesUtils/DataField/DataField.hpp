@@ -5,7 +5,7 @@
 
 typedef struct DataModel
 {
-    int total_game_number;
+    int game_number;
     int score;
     int time;
     FontManager m_Text[3];
