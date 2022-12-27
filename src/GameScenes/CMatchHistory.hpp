@@ -8,7 +8,7 @@
 #include <climits>
 #include "ScenesUtils/DataField/DataField.hpp"
 #include "ScenesUtils/InertialScroll/InertialScroll.hpp"
-#include <stack>
+#include <queue>
 
 
 class CMatchHistory : public GameScene
@@ -34,8 +34,8 @@ private:
     InertialScrollModel m_InertialScrollModel;
 
     DataField* m_DataFields;
-    std::stack<int> m_ScoreStack;
-    std::stack<DataField*> m_InActiveDataFields;
+    std::queue<int> m_ScoreQueue;
+  
     int m_FieldsSize = 0;
 private:
 

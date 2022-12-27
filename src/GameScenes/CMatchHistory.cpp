@@ -73,7 +73,7 @@ void CMatchHistory::OnCreate()
 
     while (getline(istrm, current_line, ';'))
     {
-        m_ScoreStack.push(std::stoi(current_line));
+        m_ScoreQueue.push(std::stoi(current_line));
     }
 
     istrm.close();
@@ -89,10 +89,10 @@ void CMatchHistory::OnCreate()
 
     int space_between_data_fields = 15;
 
-    if (m_DataFields == nullptr && !m_ScoreStack.empty())
+    if (m_DataFields == nullptr && !m_ScoreQueue.empty())
     {
-        m_DataFields = new DataField[m_ScoreStack.size()];
-        m_FieldsSize = m_ScoreStack.size();
+        m_DataFields = new DataField[m_ScoreQueue.size()];
+        m_FieldsSize = m_ScoreQueue.size();
     }
 
     for (int i = 0; i < m_FieldsSize; i++)
@@ -100,13 +100,13 @@ void CMatchHistory::OnCreate()
         m_DataFields[i].LoadTexture(texture_path);
         m_DataFields[i].set_Activity(true);
 
-        m_DataFields[i].get_DataModel().score = m_ScoreStack.top();
+        m_DataFields[i].get_DataModel().score = m_ScoreQueue.front();
 
         m_DataFields[i].get_Texture().set_dstRect(data_field_posX, data_field_posY + (i * (space_between_data_fields + data_field_source_height)), data_field_source_width, data_field_source_height);
 
         m_DataFields[i].get_Texture().set_srcRect(0, 0, data_field_source_width, data_field_source_height);
 
-        m_ScoreStack.pop();
+        m_ScoreQueue.pop();
        
         m_DataFields[i].get_Range().top = data_field_posY - data_field_source_height;
         m_DataFields[i].get_Range().bottom = (data_field_posY + m_MatchBoardTexture.get_srcRect().h) - 110;
@@ -115,14 +115,14 @@ void CMatchHistory::OnCreate()
 
 void CMatchHistory::BeforeDestruction()
 {
-    
+
 }
 
 void CMatchHistory::OnDestroy()
 {
     m_ReturnButton.DestroyTexture();
 
-    m_ScoreStack = std::stack<int>();
+    m_ScoreQueue = std::queue<int>();
 
     if (m_DataFields != nullptr && m_FieldsSize)
     {
@@ -241,21 +241,6 @@ void CMatchHistory::Render()
     m_MatchBoardTexture.ReloadTexture();
     m_MatchBoardTexture.RenderTexture();
 
-    for (int i = 0; i < 2; i++)
-    {
-        // if (m_InertialScrollModel.scroll_y > 0 && m_DataFieldTexture[i].get_dstRect().y + m_InertialScrollModel.scroll_y < m_range.bottom)
-        // {
-        //     m_DataFieldTexture[i].AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
-        // }
-        // else if (m_InertialScrollModel.scroll_y < 0 && m_DataFieldTexture[i].get_dstRect().y + m_InertialScrollModel.scroll_y > m_range.top)
-        // {
-        //     m_DataFieldTexture[i].AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
-        // }
-        // m_DataFieldTexture[i].AdditionAssignmentToDstRect(0, m_InertialScrollModel.scroll_y, 0, 0);
-        // m_DataFieldTexture[i].DestroyTexture();
-        // m_DataFieldTexture[i].ReloadTexture();
-        // m_DataFieldTexture[i].RenderTexture();
-    }
     for (int i = 0; i < m_FieldsSize; i++)
     {
         if (m_DataFields[i].isActive())
