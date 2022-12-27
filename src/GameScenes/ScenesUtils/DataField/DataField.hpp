@@ -11,13 +11,6 @@ typedef struct DataModel
     FontManager m_Text[3];
 };
 
-class DataField;
-
-namespace ContextHelper
-{
-    void realloc(DataField *data_fields, unsigned int old_size, unsigned int new_size);
-};
-
 class DataField
 {
     struct Range

@@ -69,21 +69,3 @@ void DataField::set_Activity(bool activity_state)
 {
     this->m_isActive = activity_state;
 }
-
-void ContextHelper::realloc(DataField *data_fields, unsigned int old_size, unsigned int new_size)
-{
-    DataField *nArr = new DataField[old_size];
-
-    for (int i = 0; i < old_size; i++)
-    {
-        nArr[i] = data_fields[i];
-    }
-    delete[] data_fields;
-    data_fields = new DataField[new_size];
-
-    for (int i = 0; i < old_size; i++)
-    {
-        data_fields[i] = nArr[i];
-    }
-    delete[] nArr;
-}
