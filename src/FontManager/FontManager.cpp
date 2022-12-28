@@ -1,6 +1,6 @@
 #include "FontManager.hpp"
 
-FontManager::FontManager() noexcept : m_Surface(nullptr), m_Texture(nullptr)
+FontManager::FontManager() noexcept : m_Surface(nullptr), m_Texture(nullptr), m_font(nullptr)
 {
   m_SreenSurface = CSDLContext::instance().get_WindowSurface();
 }
@@ -8,8 +8,11 @@ FontManager::FontManager() noexcept : m_Surface(nullptr), m_Texture(nullptr)
 FontManager::~FontManager() noexcept
 {
   DestroySurfaceAndTexture();
-
-  TTF_CloseFont(m_font);
+  if (m_font != nullptr)
+  {
+    TTF_CloseFont(m_font);
+    m_font = nullptr;
+  }
 }
 
 void FontManager::LoadFont(const char *path, int font_size)
@@ -86,8 +89,9 @@ GameSceneType FontManager_internal::callback_ChangeSceneTo(GameSceneType type)
 
 void FontManager::RenderCopy()
 {
-  if(SDL_RenderCopy(CSDLContext::instance().get_renderer(), m_Texture, NULL, &m_dst) != EXIT_SUCCESS){
-     std::cout << "Failed to blit font surface, Error: " << SDL_GetError() << '\n';
+  if (SDL_RenderCopy(CSDLContext::instance().get_renderer(), m_Texture, NULL, &m_dst) != EXIT_SUCCESS)
+  {
+    std::cout << "Failed to blit font surface, Error: " << SDL_GetError() << '\n';
   }
 }
 
