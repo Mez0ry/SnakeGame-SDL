@@ -7,8 +7,10 @@ typedef struct DataModel
 {
     int game_number;
     int score;
-    int time;
-    FontManager m_Text[3];
+    int minutes;
+    int seconds;
+    FontManager m_Text[4];
+    FontManager m_Delimiter;
 };
 
 class DataField
