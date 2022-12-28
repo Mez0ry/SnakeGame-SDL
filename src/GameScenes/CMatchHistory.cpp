@@ -78,6 +78,23 @@ void CMatchHistory::OnCreate()
 
     istrm.close();
 
+    file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "time_inGame.cfg";
+    istrm.open(file_path, std::ios::out);
+
+    if (!istrm.is_open())
+    {
+        std::cerr << "Failed to open  'time_InGame' config file."
+                  << " "
+                  << "time_InGame config path: " << file_path.c_str() << "\ncpp source filename: " << __FILENAME__;
+    }
+
+    while (getline(istrm, current_line, ';'))
+    {
+        m_InGameTime.push(std::atof(current_line.c_str()));
+    }
+
+    istrm.close();
+
     // Data fields
     std::string texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "data_field.png";
 
@@ -100,14 +117,33 @@ void CMatchHistory::OnCreate()
         m_DataFields[i].LoadTexture(texture_path);
         m_DataFields[i].set_Activity(true);
 
+        m_DataFields[i].get_DataModel().game_number = m_FieldsSize - i;
         m_DataFields[i].get_DataModel().score = m_ScoreQueue.front();
+        m_DataFields[i].get_DataModel().minutes = (int)m_InGameTime.front();
+
+        std::string str = std::to_string(m_InGameTime.front());
+
+        // Deletes decimal part and leaves the fractional
+        bool is_Deleted = false;
+        for (int i = 0; i < str.length() && !is_Deleted; i++)
+        {
+            if (str[i] == ',' || str[i] == '.'){
+                is_Deleted = true;
+                continue;
+            }
+            str[i] = '0';
+        }
+
+        double seconds = std::stod(str) * 60;
+        m_DataFields[i].get_DataModel().seconds = seconds;
 
         m_DataFields[i].get_Texture().set_dstRect(data_field_posX, data_field_posY + (i * (space_between_data_fields + data_field_source_height)), data_field_source_width, data_field_source_height);
 
         m_DataFields[i].get_Texture().set_srcRect(0, 0, data_field_source_width, data_field_source_height);
 
         m_ScoreQueue.pop();
-       
+        m_InGameTime.pop();
+
         m_DataFields[i].get_Range().top = data_field_posY - data_field_source_height;
         m_DataFields[i].get_Range().bottom = (data_field_posY + m_MatchBoardTexture.get_srcRect().h) - 110;
     }
@@ -115,7 +151,6 @@ void CMatchHistory::OnCreate()
 
 void CMatchHistory::BeforeDestruction()
 {
-
 }
 
 void CMatchHistory::OnDestroy()
@@ -123,6 +158,7 @@ void CMatchHistory::OnDestroy()
     m_ReturnButton.DestroyTexture();
 
     m_ScoreQueue = std::queue<int>();
+    m_InGameTime = std::queue<double>();
 
     if (m_DataFields != nullptr && m_FieldsSize)
     {
@@ -165,7 +201,7 @@ void CMatchHistory::InputHandler()
 
             if (m_event.wheel.preciseY < 0)
             {
-                 m_InertialScroll.CalculateAcceleration(false);
+                m_InertialScroll.CalculateAcceleration(false);
             }
         }
 
@@ -181,7 +217,7 @@ void CMatchHistory::InputHandler()
 
 void CMatchHistory::Update()
 {
-   m_InertialScroll.Decelerate();
+    m_InertialScroll.Decelerate();
 
     for (int i = 0; i < m_FieldsSize; i++)
     {
@@ -203,7 +239,7 @@ void CMatchHistory::Render()
     m_MatchBoardTexture.DestroyTexture();
     m_MatchBoardTexture.ReloadTexture();
     m_MatchBoardTexture.RenderTexture();
-
+    
     for (int i = 0; i < m_FieldsSize; i++)
     {
         if (m_DataFields[i].isActive())
