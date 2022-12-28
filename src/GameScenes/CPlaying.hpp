@@ -7,6 +7,9 @@
 #include "../GameScore/GameScore.hpp"
 #include "../CollideSystem/CollideSystem.hpp"
 #include "../AchievementSystem/AchievementSystem.hpp"
+#include "../Timer/Timer.hpp"
+#include <list>
+
 class CPlaying : public GameScene
 {
 public:
@@ -32,5 +35,8 @@ private:
   GameScore m_GameScore;
   CollideSystem m_CollideSystem;
   AchievementSystem m_AchievementSystem;
+  Timer m_StartToFinishTimer;
+
+  std::list<double> m_InGameTimeStack;
 };
 #endif //! SnakeGame_GameScenes_CPLAYING_HPP

@@ -1,32 +1,34 @@
 #include "CPlaying.hpp"
 
-CPlaying::CPlaying() {
+CPlaying::CPlaying()
+{
   m_pFoodFlyweight = std::make_shared<FoodFlyweight>();
 
-  const std::string& symbol = CAppSettings::instance().get_SlashSymbol();
+  const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
   std::string food_texture_path;
 
-  food_texture_path = CAppSettings::instance().get_SourceFolder()  + symbol + "assets" + symbol + "food" + symbol + "apple.png";
-  m_pFoodFlyweight->AddFood(FoodName::APPLE,FoodType::Edible,6,food_texture_path);
-  
-  food_texture_path = CAppSettings::instance().get_SourceFolder()  + symbol + "assets" + symbol + "food" + symbol + "water_melon.png";
-  m_pFoodFlyweight->AddFood(FoodName::WATER_MELON,FoodType::Edible,6,food_texture_path);
-  
-  food_texture_path = CAppSettings::instance().get_SourceFolder()  + symbol + "assets" + symbol + "food" + symbol + "star_fruit.png";
-  m_pFoodFlyweight->AddFood(FoodName::STAR_FRUIT,FoodType::Edible,10,food_texture_path);
+  food_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "food" + symbol + "apple.png";
+  m_pFoodFlyweight->AddFood(FoodName::APPLE, FoodType::Edible, 6, food_texture_path);
 
-  food_texture_path = CAppSettings::instance().get_SourceFolder()  + symbol + "assets" + symbol + "food" + symbol + "burger.png";
-  m_pFoodFlyweight->AddFood(FoodName::BURGER,FoodType::InEdible,8,food_texture_path);
-  
-  food_texture_path = CAppSettings::instance().get_SourceFolder()  + symbol + "assets" + symbol + "food" + symbol + "hotdog.png";
-  m_pFoodFlyweight->AddFood(FoodName::HOTDOG,FoodType::InEdible,3,food_texture_path);
+  food_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "food" + symbol + "water_melon.png";
+  m_pFoodFlyweight->AddFood(FoodName::WATER_MELON, FoodType::Edible, 6, food_texture_path);
 
-  food_texture_path = CAppSettings::instance().get_SourceFolder()  + symbol + "assets" + symbol + "food" + symbol + "steak.png";
-  m_pFoodFlyweight->AddFood(FoodName::STEAK,FoodType::InEdible,2,food_texture_path);
-  
+  food_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "food" + symbol + "star_fruit.png";
+  m_pFoodFlyweight->AddFood(FoodName::STAR_FRUIT, FoodType::Edible, 10, food_texture_path);
+
+  food_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "food" + symbol + "burger.png";
+  m_pFoodFlyweight->AddFood(FoodName::BURGER, FoodType::InEdible, 8, food_texture_path);
+
+  food_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "food" + symbol + "hotdog.png";
+  m_pFoodFlyweight->AddFood(FoodName::HOTDOG, FoodType::InEdible, 3, food_texture_path);
+
+  food_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "food" + symbol + "steak.png";
+  m_pFoodFlyweight->AddFood(FoodName::STEAK, FoodType::InEdible, 2, food_texture_path);
+
   m_Snake.set_MapState(m_Map.get_MapState());
 
-  for (short int i = 0; i < FOOD_SIZE; i++) {
+  for (short int i = 0; i < FOOD_SIZE; i++)
+  {
     m_food[i].set_MapState(m_Map.get_MapState());
 
     m_food[i].set_FoodFlyweight(m_pFoodFlyweight);
@@ -38,37 +40,70 @@ CPlaying::CPlaying() {
 
 CPlaying::~CPlaying() {}
 
-void CPlaying::OnCreate() {
+void CPlaying::OnCreate()
+{
+  m_StartToFinishTimer.Start();
+
   m_GameScore.OnCreate();
   m_Map.OnCreate();
   m_Snake.OnCreate();
-  
-  for (short int i = 0; i < FOOD_SIZE; i++) {
+
+  for (short int i = 0; i < FOOD_SIZE; i++)
+  {
     m_food[i].RespawnNewFood();
   }
-
 }
 
 void CPlaying::BeforeDestruction()
 {
-   this->Render();
-   TakeAndSaveScreenShot();
+  this->Render();
+  TakeAndSaveScreenShot();
 }
 
-void CPlaying::OnDestroy() {
+void CPlaying::OnDestroy()
+{
   m_Snake.OnDestroy();
   m_GameScore.OnDestroy();
+
+  double time_in_game = m_StartToFinishTimer.GetDurationInSeconds();
+  m_InGameTimeStack.push_front(time_in_game / 60);
+
+  const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
+  std::string file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "time_inGame.cfg";
+
+  std::fstream write_config_file(file_path.c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::trunc);
+
+  if (!write_config_file.is_open())
+  {
+    std::cerr << "Failed to open score_history file."
+              << " "
+              << "time in game path: " << file_path.c_str() << "\nFilename: " << __FILENAME__;
+  }
+
+  for (auto &val : m_InGameTimeStack)
+  {
+    write_config_file << (double)val << ';';
+  }
+
+  write_config_file.close();
+
 }
 
-void CPlaying::InputHandler() {
-  if (SDL_PollEvent(&m_event)) {
-    switch (m_event.type) {
-    case SDL_QUIT: {
+void CPlaying::InputHandler()
+{
+  if (SDL_PollEvent(&m_event))
+  {
+    switch (m_event.type)
+    {
+    case SDL_QUIT:
+    {
       g_GameSceneType = GameSceneType::Exit;
       break;
     }
-    case SDL_KEYDOWN: {
-      switch (m_event.key.keysym.sym) {
+    case SDL_KEYDOWN:
+    {
+      switch (m_event.key.keysym.sym)
+      {
       case SDLK_LEFT:
         m_Snake.get_SnakeState().moving.move_dir = MoveDir::LEFT;
         m_Snake.get_SnakeState().type = SNAKE_MOVING_STATE;
@@ -85,11 +120,13 @@ void CPlaying::InputHandler() {
         m_Snake.get_SnakeState().moving.move_dir = MoveDir::DOWN;
         m_Snake.get_SnakeState().type = SNAKE_MOVING_STATE;
         break;
-      case SDLK_r: {
+      case SDLK_r:
+      {
 
         break;
       }
-      case SDLK_ESCAPE: {
+      case SDLK_ESCAPE:
+      {
         g_GameSceneType = GameSceneType::Pause;
         break;
       }
@@ -101,22 +138,27 @@ void CPlaying::InputHandler() {
   m_Snake.InputHandler();
 }
 
-void CPlaying::Update() {
+void CPlaying::Update()
+{
   m_Snake.Update();
-  for (short int i = 0; i < FOOD_SIZE; i++) {
+  for (short int i = 0; i < FOOD_SIZE; i++)
+  {
     m_food[i].Update();
 
-    if(m_CollideSystem.IsColliding(m_Snake, m_food[i])){
+    if (m_CollideSystem.IsColliding(m_Snake, m_food[i]))
+    {
       m_Snake.get_SnakeState().type = SNAKE_GROW_STATE;
     }
   }
-  
+
   m_GameScore.Update();
   m_AchievementSystem.Update();
 }
 
-void CPlaying::Render() {
-  for (short int i = 0; i < FOOD_SIZE; i++) {
+void CPlaying::Render()
+{
+  for (short int i = 0; i < FOOD_SIZE; i++)
+  {
     m_food[i].Render();
   }
   m_Map.Render();
@@ -125,10 +167,9 @@ void CPlaying::Render() {
   m_AchievementSystem.Render();
 }
 
-
 void CPlaying::TakeAndSaveScreenShot()
 {
-  const std::string& symbol = CAppSettings::instance().get_SlashSymbol();
+  const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
   std::string texture_path;
   texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CPause" + symbol;
   std::string filename = "background.bmp";
