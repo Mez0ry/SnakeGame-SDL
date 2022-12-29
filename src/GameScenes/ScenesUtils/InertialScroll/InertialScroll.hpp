@@ -26,7 +26,7 @@ public:
 /**
  * @brief Calculates acceleration
 */
-    void CalculateAcceleration(bool isUp);
+    void CalculateAcceleration(double delta_y);
 
     const InertialScrollModel &get_Model() const { return m_Model; }
 
