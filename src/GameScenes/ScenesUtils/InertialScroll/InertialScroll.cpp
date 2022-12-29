@@ -30,7 +30,7 @@ void InertialScroll::Decelerate()
         m_Model.scroll_acceleration = 0, m_Model.scrolling = false, m_Model.scroll_y = 0;
 }
 
-void InertialScroll::CalculateAcceleration(bool isUp)
+void InertialScroll::CalculateAcceleration(double delta_y)
 {
 
     if (m_Model.scrolling == 0)
@@ -39,13 +39,8 @@ void InertialScroll::CalculateAcceleration(bool isUp)
     }
     else
     {
-        double dy{};
-
-        if (isUp)
-            dy =  0.2;
-        else
-            dy = -0.2;
-
+       double dy = delta_y;
+        
         m_Model.scroll_acceleration = dy * 30;
         m_Model.scrolling = 1;
     }

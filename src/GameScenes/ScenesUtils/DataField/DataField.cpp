@@ -1,5 +1,5 @@
 #include "DataField.hpp"
-DataField::DataField() : m_isActive(true)
+DataField::DataField()
 {
     const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
     m_DataModel.game_number = -1;
@@ -17,22 +17,11 @@ DataField::DataField() : m_isActive(true)
 
 DataField::~DataField()
 {
+    
 }
 
 void DataField::Update()
 {
-    if ((m_DataFieldTexture.get_dstRect().y - m_DataFieldTexture.get_srcRect().h) < m_range.top || (m_DataFieldTexture.get_dstRect().y + m_DataFieldTexture.get_srcRect().h) > m_range.bottom)
-    {
-        m_isActive = false;
-    }
-    else
-    {
-        m_isActive = true;
-    }
-
-    if (!m_isActive)
-        return;
-
     int internal_data_position_x = m_DataFieldTexture.get_dstRect().x + 15;
     int internal_data_position_y = m_DataFieldTexture.get_dstRect().y;
     int space_between_internal_data = 115;
@@ -63,6 +52,7 @@ void DataField::Render()
         m_DataModel.m_Text[i].LoadSurfaceAndTexture(std::to_string(*pInnerDataField).c_str(), {100, 165, 204, 255});
         m_DataModel.m_Text[i].RenderCopy();
     }
+
     m_DataModel.m_Delimiter.DestroySurfaceAndTexture();
     m_DataModel.m_Delimiter.LoadSurfaceAndTexture(":", {100, 165, 204, 255});
     m_DataModel.m_Delimiter.RenderCopy();
@@ -71,9 +61,4 @@ void DataField::Render()
 void DataField::LoadTexture(const std::string &texture_path, ImageType type /*= ImageType::PNG*/)
 {
     m_DataFieldTexture.LoadTexture(texture_path, type);
-}
-
-void DataField::set_Activity(bool activity_state)
-{
-    this->m_isActive = activity_state;
 }

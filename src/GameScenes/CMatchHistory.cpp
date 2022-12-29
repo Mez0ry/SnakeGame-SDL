@@ -115,7 +115,6 @@ void CMatchHistory::OnCreate()
     for (int i = 0; i < m_FieldsSize; i++)
     {
         m_DataFields[i].LoadTexture(texture_path);
-        m_DataFields[i].set_Activity(true);
 
         m_DataFields[i].get_DataModel().game_number = m_FieldsSize - i;
         m_DataFields[i].get_DataModel().score = m_ScoreQueue.front();
@@ -143,9 +142,6 @@ void CMatchHistory::OnCreate()
 
         m_ScoreQueue.pop();
         m_InGameTime.pop();
-
-        m_DataFields[i].get_Range().top = data_field_posY - data_field_source_height;
-        m_DataFields[i].get_Range().bottom = (data_field_posY + m_MatchBoardTexture.get_srcRect().h) - 110;
     }
 }
 
@@ -196,12 +192,12 @@ void CMatchHistory::InputHandler()
         {
             if (m_event.wheel.preciseY > 0)
             {
-                m_InertialScroll.CalculateAcceleration(true);
+                m_InertialScroll.CalculateAcceleration(0.2);
             }
 
             if (m_event.wheel.preciseY < 0)
             {
-                m_InertialScroll.CalculateAcceleration(false);
+                m_InertialScroll.CalculateAcceleration(-0.2);
             }
         }
 
@@ -239,14 +235,20 @@ void CMatchHistory::Render()
     m_MatchBoardTexture.DestroyTexture();
     m_MatchBoardTexture.ReloadTexture();
     m_MatchBoardTexture.RenderTexture();
-    
+
+    SDL_Rect clip_rect = {m_MatchBoardTexture.get_dstRect().x, m_MatchBoardTexture.get_dstRect().y + 40,  m_MatchBoardTexture.get_dstRect().w, (m_MatchBoardTexture.get_dstRect().y + m_MatchBoardTexture.get_dstRect().h) - 10};
+   
+    SDL_RenderSetClipRect(CSDLContext::instance().get_renderer(), &clip_rect);
+
     for (int i = 0; i < m_FieldsSize; i++)
     {
-        if (m_DataFields[i].isActive())
+        if ( (m_DataFields[i].get_Texture().get_dstRect().y + 36 ) < (m_MatchBoardTexture.get_dstRect().y + m_MatchBoardTexture.get_srcRect().h) - 5)
         {
             m_DataFields[i].Render();
         }
     }
+
+    SDL_RenderSetClipRect(CSDLContext::instance().get_renderer(),NULL);
 }
 
 template <typename std::size_t Row_Size, typename std::size_t Col_Size>
