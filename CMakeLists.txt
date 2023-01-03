@@ -44,10 +44,12 @@ set(TextureManager src/TextureManager/TextureManager.hpp src/TextureManager/Text
 
 set(Timer src/Timer/Timer.hpp src/Timer/Timer.cpp)
 
+set(Serializer src/Serializer/Serializer.hpp)
+
 message("Root SOURCES: ${RootSources}\n")
 message("Root HEADERS: ${RootHeaders}\n")
 
-add_executable(${ProjectName} ${RootSources} ${RootHeaders} ${CSDLContext} ${CAppSettings} ${CollideSystem} ${FontManager} ${Food} ${SceneUtils}  ${GameScenes} ${GameScore} ${Observer} ${AchievementSystem} ${Snake} ${SoundManager} ${SpriteAnimation} ${TextureManager} ${Timer})
+add_executable(${ProjectName} ${RootSources} ${RootHeaders} ${CSDLContext} ${CAppSettings} ${CollideSystem} ${FontManager} ${Food} ${SceneUtils}  ${GameScenes} ${GameScore} ${Observer} ${AchievementSystem} ${Snake} ${SoundManager} ${SpriteAnimation} ${TextureManager} ${Timer} ${Serializer})
 
 ##Vendor
 set(SDL_STATIC ON CACHE BOOL "" FORCE)
