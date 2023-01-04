@@ -138,7 +138,7 @@ public:
 
           size_t property_values_size = val.second.get_DataSize();
 
-          for (size_t i = 0; i < property_values_size; i++)
+          for (size_t i = 0; i < val.second.get_DataSize(); i++)
           {
             size_t first_sep_index =
                 val.second.get_String(i).find_first_of(seperator_symbol);
