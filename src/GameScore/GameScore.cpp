@@ -4,8 +4,6 @@ GameScore::GameScore() : m_Score(99)
 {
   const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
 
-  m_ScoreHistoryPath = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + m_ScoreHistoryFileName;
-
   std::string font_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "fonts" + symbol + "HACKED.ttf";
 
   m_FontManager.LoadFont(font_path.c_str(), 20);
@@ -26,21 +24,21 @@ void GameScore::OnDestroy()
 {
   m_GamesScore.push_front(m_Score);
 
-  std::fstream write_config_file(m_ScoreHistoryPath.c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::trunc);
+  const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
+  std::string file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "CMatchHistory-Data.cfg";
+  
+  Serializer ser;
+  auto& node = ser["CMatchHistory-Data"];
+  auto& score_property = node["Score"];
+  
+  int write_index = 0;
 
-  if (!write_config_file.is_open())
-  {
-    std::cerr << "Failed to open score_history file."
-              << " "
-              << "Score history path: " << m_ScoreHistoryPath.c_str() << "\nFilename: " << __FILENAME__;
+  for(auto it = m_GamesScore.begin(); it != m_GamesScore.end();it++,write_index++){
+      score_property.set_Int(*it,write_index);
   }
-
-  for (auto &val : m_GamesScore)
-  {
-    write_config_file << val << ';';
-  }
-
-  write_config_file.close();
+  
+  Serializer::Serialize(ser,file_path);
+  
 }
 
 void GameScore::Update()

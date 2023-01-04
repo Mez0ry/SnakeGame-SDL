@@ -9,6 +9,7 @@
 #include "../Entity/EntityNull.hpp"
 #include <list>
 #include <fstream>
+#include "../Serializer/Serializer.hpp"
 
 class GameScore : public Observer, public Subject{
 private:
@@ -49,7 +50,5 @@ private:
   FontManager m_FontManager;
   SDL_Color m_ScoreColor = {255, 255, 255, 255};
   int m_Score;
-  std::string m_ScoreHistoryPath;
-  const char* m_ScoreHistoryFileName = "score_history.cfg";
 };
 #endif //! SnakeGame_GAME_SCORE_HPP

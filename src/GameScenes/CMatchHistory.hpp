@@ -9,6 +9,7 @@
 #include "ScenesUtils/DataField/DataField.hpp"
 #include "ScenesUtils/InertialScroll/InertialScroll.hpp"
 #include <queue>
+#include "../Serializer/Serializer.hpp"
 
 class CMatchHistory : public GameScene
 {
@@ -36,8 +37,6 @@ private:
 
     int m_FieldsSize = 0;
 private:
-    
-
     template <typename std::size_t Row_Size, typename std::size_t Col_Size>
     constexpr int ClosestTextureResolution(int texture_resolution_arr[Row_Size][Col_Size], int row, int col);
 };

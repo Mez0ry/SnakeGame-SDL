@@ -69,24 +69,21 @@ void CPlaying::OnDestroy()
   m_InGameTimeStack.push_front(time_in_game / 60);
 
   const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
-  std::string file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "time_inGame.cfg";
+  std::string file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "CMatchHistory-Data.cfg";
 
-  std::fstream write_config_file(file_path.c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::trunc);
+  Serializer des;
+  if(Serializer::Deserialize(des,file_path)){
+    auto& node = des["CMatchHistory-Data"];
+    auto& time_property = node["Time"];
+    
+    int write_index = 0;
 
-  if (!write_config_file.is_open())
-  {
-    std::cerr << "Failed to open score_history file."
-              << " "
-              << "time in game path: " << file_path.c_str() << "\nFilename: " << __FILENAME__;
+    for(auto it = m_InGameTimeStack.begin(); it != m_InGameTimeStack.end();it++,write_index++){
+      time_property.set_Double(*it,write_index);
+    }
+  
+    Serializer::Serialize(des,file_path);
   }
-
-  for (auto &val : m_InGameTimeStack)
-  {
-    write_config_file << (double)val << ';';
-  }
-
-  write_config_file.close();
-
 }
 
 void CPlaying::InputHandler()
