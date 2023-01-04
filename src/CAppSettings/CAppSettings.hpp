@@ -24,11 +24,11 @@
 #include <unordered_map>
 
 #include "../Timer/Timer.hpp"
+#include "../Serializer/Serializer.hpp"
 
 class CAppSettings {
  private:
-  using SettingsMapType = std::unordered_map<unsigned int, std::string>;
-  SettingsMapType m_SettingsMap;
+  Serializer m_Serializer;
 
   std::string m_ConfigPath;
   std::string m_SlashSymbol;
@@ -40,7 +40,7 @@ class CAppSettings {
 
   static CAppSettings& instance();
   /**
-   * @brief Reads config file and adding settings to the map
+   * @brief Deserializing config file
   */
   void LoadSettings();
 
