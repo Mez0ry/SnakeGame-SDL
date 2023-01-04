@@ -9,6 +9,7 @@
 #include "../AchievementSystem/AchievementSystem.hpp"
 #include "../Timer/Timer.hpp"
 #include <list>
+#include "../Serializer/Serializer.hpp"
 
 class CPlaying : public GameScene
 {
