@@ -47,6 +47,16 @@ public:
     return std::atof(get_String(item_idx).c_str());
   }
 
+  void set_Double(double data, const size_t item_idx = 0)
+  {
+    set_String(std::to_string(data), item_idx);
+  }
+
+  const double get_Double(const size_t item_idx) const
+  {
+    return std::stod(get_String(item_idx).c_str());
+  }
+
   void set_Bool(bool data, const size_t item_idx = 0)
   {
     if (data)
