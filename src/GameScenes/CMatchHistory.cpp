@@ -3,6 +3,16 @@
 CMatchHistory::CMatchHistory()
 {
     const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
+    std::string data_file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "CMatchHistory-Data.cfg";
+   
+    auto clean_file = [&](const std::string& file_path) -> void{
+        std::fstream fstr(file_path.c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::trunc); //std::ios::trunc flag cleans file
+        if(fstr.is_open())
+            fstr.close();
+    };
+
+    clean_file(data_file_path.c_str());
+
     std::string texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "Other" + symbol + "buttons" + symbol + "return_button.png";
 
     // Return button
@@ -52,48 +62,25 @@ CMatchHistory::CMatchHistory()
     m_MatchBoardTexture.set_dstRect(match_board_posX, match_board_posY, match_board_source_width, match_board_source_height);
 }
 
-CMatchHistory::~CMatchHistory()
-{
-}
+CMatchHistory::~CMatchHistory() {}
 
 void CMatchHistory::OnCreate()
 {
     const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
-    std::string file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "score_history.cfg";
+    std::string file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "CMatchHistory-Data.cfg";
 
-    std::ifstream istrm(file_path, std::ios::out);
-    if (!istrm.is_open())
+    Serializer des;
+    if (Serializer::Deserialize(des, file_path))
     {
-        std::cerr << "Failed to open  'Score history' config file."
-                  << " "
-                  << "score history config path: " << file_path.c_str() << "\ncpp source filename: " << __FILENAME__;
+        auto& node = des["CMatchHistory-Data"];
+        auto& time_property = node["Time"];
+        auto& score_property = node["Score"];
+
+        for(int read_index = 0;read_index<time_property.get_DataSize() && read_index < score_property.get_DataSize();read_index++){
+            m_InGameTime.push(time_property.get_Double(read_index));
+            m_ScoreQueue.push(score_property.get_Int(read_index));
+        }
     }
-
-    std::string current_line;
-
-    while (getline(istrm, current_line, ';'))
-    {
-        m_ScoreQueue.push(std::stoi(current_line));
-    }
-
-    istrm.close();
-
-    file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "time_inGame.cfg";
-    istrm.open(file_path, std::ios::out);
-
-    if (!istrm.is_open())
-    {
-        std::cerr << "Failed to open  'time_InGame' config file."
-                  << " "
-                  << "time_InGame config path: " << file_path.c_str() << "\ncpp source filename: " << __FILENAME__;
-    }
-
-    while (getline(istrm, current_line, ';'))
-    {
-        m_InGameTime.push(std::atof(current_line.c_str()));
-    }
-
-    istrm.close();
 
     // Data fields
     std::string texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "data_field.png";
@@ -112,31 +99,38 @@ void CMatchHistory::OnCreate()
         m_FieldsSize = m_ScoreQueue.size();
     }
 
+    auto fnDelete_decimal_part = [&](std::string& str_out){
+         for (int i = 0; i < str_out.length(); i++)
+         {
+            if (str_out[i] == ',' || str_out[i] == '.')
+            {
+                return;
+            }
+            str_out[i] = '0';
+         }
+    };
+
     for (int i = 0; i < m_FieldsSize; i++)
     {
         m_DataFields[i].LoadTexture(texture_path);
 
         m_DataFields[i].get_DataModel().game_number = m_FieldsSize - i;
         m_DataFields[i].get_DataModel().score = m_ScoreQueue.front();
-        m_DataFields[i].get_DataModel().minutes = (int)m_InGameTime.front();
+        m_DataFields[i].get_DataModel().minutes = (int)m_InGameTime.front(); //explicit conversion is used to discard the fractional part
 
         std::string str = std::to_string(m_InGameTime.front());
 
         // Deletes decimal part and leaves the fractional
-        bool is_Deleted = false;
-        for (int i = 0; i < str.length() && !is_Deleted; i++)
-        {
-            if (str[i] == ',' || str[i] == '.'){
-                is_Deleted = true;
-                continue;
-            }
-            str[i] = '0';
-        }
+        fnDelete_decimal_part(str);
 
         double seconds = std::stod(str) * 60;
         m_DataFields[i].get_DataModel().seconds = seconds;
 
-        m_DataFields[i].get_Texture().set_dstRect(data_field_posX, data_field_posY + (i * (space_between_data_fields + data_field_source_height)), data_field_source_width, data_field_source_height);
+        m_DataFields[i].get_Texture().set_dstRect(
+            data_field_posX,
+            data_field_posY +
+                (i * (space_between_data_fields + data_field_source_height)),
+            data_field_source_width, data_field_source_height);
 
         m_DataFields[i].get_Texture().set_srcRect(0, 0, data_field_source_width, data_field_source_height);
 
@@ -145,9 +139,7 @@ void CMatchHistory::OnCreate()
     }
 }
 
-void CMatchHistory::BeforeDestruction()
-{
-}
+void CMatchHistory::BeforeDestruction() {}
 
 void CMatchHistory::OnDestroy()
 {
@@ -180,7 +172,8 @@ void CMatchHistory::InputHandler()
         }
         case SDL_MOUSEBUTTONDOWN:
         {
-            if (m_event.button.button == SDL_BUTTON_LEFT && m_ReturnButton.CursorIsColliding(cursor_pos))
+            if (m_event.button.button == SDL_BUTTON_LEFT &&
+                m_ReturnButton.CursorIsColliding(cursor_pos))
             {
                 g_GameSceneType = GameSceneType::Menu;
             }
@@ -217,7 +210,8 @@ void CMatchHistory::Update()
 
     for (int i = 0; i < m_FieldsSize; i++)
     {
-        m_DataFields[i].get_Texture().AdditionAssignmentToDstRect(0, m_InertialScroll.get_Model().scroll_y, 0, 0);
+        m_DataFields[i].get_Texture().AdditionAssignmentToDstRect(
+            0, m_InertialScroll.get_Model().scroll_y, 0, 0);
         m_DataFields[i].Update();
     }
 }
@@ -236,23 +230,28 @@ void CMatchHistory::Render()
     m_MatchBoardTexture.ReloadTexture();
     m_MatchBoardTexture.RenderTexture();
 
-    SDL_Rect clip_rect = {m_MatchBoardTexture.get_dstRect().x, m_MatchBoardTexture.get_dstRect().y + 40,  m_MatchBoardTexture.get_dstRect().w, (m_MatchBoardTexture.get_dstRect().y + m_MatchBoardTexture.get_dstRect().h) - 10};
-   
+    SDL_Rect clip_rect = {m_MatchBoardTexture.get_dstRect().x, m_MatchBoardTexture.get_dstRect().y + 40, m_MatchBoardTexture.get_dstRect().w, 
+    (m_MatchBoardTexture.get_dstRect().y +  m_MatchBoardTexture.get_dstRect().h) - 10};
+
     SDL_RenderSetClipRect(CSDLContext::instance().get_renderer(), &clip_rect);
 
     for (int i = 0; i < m_FieldsSize; i++)
     {
-        if ( (m_DataFields[i].get_Texture().get_dstRect().y + 36 ) < (m_MatchBoardTexture.get_dstRect().y + m_MatchBoardTexture.get_srcRect().h) - 5)
+        if ((m_DataFields[i].get_Texture().get_dstRect().y + 36) <
+            (m_MatchBoardTexture.get_dstRect().y +
+             m_MatchBoardTexture.get_srcRect().h) -
+                5)
         {
             m_DataFields[i].Render();
         }
     }
 
-    SDL_RenderSetClipRect(CSDLContext::instance().get_renderer(),NULL);
+    SDL_RenderSetClipRect(CSDLContext::instance().get_renderer(), NULL);
 }
 
 template <typename std::size_t Row_Size, typename std::size_t Col_Size>
-constexpr int CMatchHistory::ClosestTextureResolution(int texture_resolution_arr[Row_Size][Col_Size], int row, int col)
+constexpr int CMatchHistory::ClosestTextureResolution(
+    int texture_resolution_arr[Row_Size][Col_Size], int row, int col)
 {
     int window_width = CAppSettings::instance().get_WindowWidth();
     int window_height = CAppSettings::instance().get_WindowHeight();
