@@ -6,6 +6,7 @@
 #include "SDL2/SDL_mixer.h"
 #include "SDL2/SDL_ttf.h"
 #include "../Timer/Timer.hpp"
+#include "../Logger/Logger.hpp"
 
 class CSDLContext {
 public:

@@ -12,7 +12,7 @@ AchievementSettings::~AchievementSettings()
 
 void AchievementSettings::ParseConfigFile(std::vector<AchievementInternal::var_t> &vec_out)
 {
-    Timer FunctionTimer("AchievementSettings::ParseConfigFile(... &vec_out)");
+    Timer FunctionTimer;
 
     std::fstream write_config_file(m_ConfigPath.c_str(), std::ios::out | std::ios::in | std::ios::app | std::ios::binary);
 

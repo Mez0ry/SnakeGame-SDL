@@ -25,6 +25,7 @@
 
 #include "../Timer/Timer.hpp"
 #include "../Serializer/Serializer.hpp"
+#include "../Logger/Logger.hpp"
 
 class CAppSettings {
  private:
