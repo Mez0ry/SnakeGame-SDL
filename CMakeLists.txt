@@ -46,10 +46,11 @@ set(Timer src/Timer/Timer.hpp src/Timer/Timer.cpp)
 
 set(Serializer src/Serializer/Serializer.hpp)
 
+set(Logger src/Logger/Logger.hpp src/Logger/Logger.cpp)
 message("Root SOURCES: ${RootSources}\n")
 message("Root HEADERS: ${RootHeaders}\n")
 
-add_executable(${ProjectName} ${RootSources} ${RootHeaders} ${CSDLContext} ${CAppSettings} ${CollideSystem} ${FontManager} ${Food} ${SceneUtils}  ${GameScenes} ${GameScore} ${Observer} ${AchievementSystem} ${Snake} ${SoundManager} ${SpriteAnimation} ${TextureManager} ${Timer} ${Serializer})
+add_executable(${ProjectName} ${RootSources} ${RootHeaders} ${CSDLContext} ${CAppSettings} ${CollideSystem} ${FontManager} ${Food} ${SceneUtils}  ${GameScenes} ${GameScore} ${Observer} ${AchievementSystem} ${Snake} ${SoundManager} ${SpriteAnimation} ${TextureManager} ${Timer} ${Serializer} ${Logger})
 
 ##Vendor
 set(SDL_STATIC ON CACHE BOOL "" FORCE)
