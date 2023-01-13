@@ -13,13 +13,7 @@ CAppSettings &CAppSettings::instance()
 
   return instance;
 }
-/**
- * window_height = 720
-  window_width = 800
-  map_height = 20
-  map_width = 20
-  fullscreen_mode = false
-*/
+
 void CAppSettings::LoadSettings()
 {
   Timer FunctionTimer;
