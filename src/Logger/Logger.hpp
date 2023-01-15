@@ -230,6 +230,12 @@ struct MethodModel {
 template <class _Tp, class... _Types>
 using all_same = std::enable_if_t<std::conjunction_v<std::is_same<_Tp, _Types>...>>;
 
+template <typename T>
+using IsReference = std::enable_if_t<std::is_reference_v<T>>;
+
+template <typename T>
+using IsNotReference = std::enable_if_t<not std::is_reference_v<T>>;
+
 class Method {
 private:
   MethodModel m_model;
@@ -243,22 +249,11 @@ public:
 
   template <typename... Args, class = all_same<MessageModel, Args...>>
   inline void AddContent(const std::string &content_name, Args... args) {
-    if (m_model.contentId.count(content_name) == 0) {
-      content_type_t local_content(content_name);
-      m_model.contentId[content_name] = m_model.content.size();
-      (local_content.push_back(args.get_pair()), ...);
-      m_model.content.push_back(local_content);
-    } else {
       (GetContent(content_name).push_back(args.get_pair()), ...);
-    }
   }
-
-  inline void AddContent(const std::string &content_name,
-                         const std::string &msg,
-                         NotifyType level = NotifyType::EMPTY) {
-    content_type_t local_content(content_name);
-    local_content.push_back(std::make_pair(msg, level));
-    m_model.content.push_back(local_content);
+  template <typename _Type,class = IsNotReference<_Type> >
+  inline void AddContent(const std::string &content_name,_Type&& model) {
+    GetContent(content_name).push_back(model.get_pair());
   }
 
   inline content_ref_type_t GetContent(size_type index) {
@@ -297,6 +292,7 @@ public:
     m_model.content.clear();
     m_model.contentId.clear();
   }
+  
   std::string GetMethodSummary(){
     if(GetExecutionTime() < 0) return "";
     LoggerInfo log_info;
@@ -312,6 +308,8 @@ public:
 
 namespace logModule {
 using log_method_t = logMethod::Method;
+using log_method_ref_t = log_method_t&;
+using log_const_method_ref_t = const log_method_ref_t;
 
 struct ModuleModel {
   ModuleModel() {}
@@ -352,7 +350,7 @@ public:
     }
   }
 
-  log_method_t &GetMethod(size_type index) {
+  log_method_ref_t GetMethod(size_type index) {
     if (index >= m_methods.size()) {
       throw std::out_of_range("Out of range");
     }
@@ -360,7 +358,7 @@ public:
     return m_methods[index];
   }
 
-  log_method_t &GetMethod(const std::string &method_name) {
+  log_method_ref_t GetMethod(const std::string &method_name) {
     AddMethod(method_name);
 
     return m_methods[m_MethodId[method_name]];
