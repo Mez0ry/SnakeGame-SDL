@@ -38,7 +38,7 @@ void SnakeBody::Update(SquareType **map_state, EntityPosition &snake_position)
 
 void SnakeBody::Render()
 {
-    for(int i = 0;i < m_CurrSize; i++){
+    for(int i = 0;i < rq.size(); i++){
         if(i == 0) continue;
         
         if (rq[i].y / TextureConstants::TextureHeight > CAppSettings::instance().get_MapHeight() || rq[i].x / TextureConstants::TextureWidth > CAppSettings::instance().get_MapWidth() || rq[i].y / TextureConstants::TextureHeight < 0 || rq[i].x / TextureConstants::TextureWidth < 0)

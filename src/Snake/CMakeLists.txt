@@ -1,12 +1,7 @@
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+set(SNAKE_STATES_HEADERS SnakeStates/IdleState.hpp SnakeStates/MovingState.hpp SnakeStates/SnakeStatesController.hpp)
+set(SNAKE_STATES_SOURCES SnakeStates/IdleState.cpp SnakeStates/MovingState.cpp SnakeStates/SnakeStatesController.cpp)
 
-set(Snake_Sources Snake.cpp SnakeBody.cpp)
-set(Snake_Headers ISnakeStates.hpp Snake.hpp SnakeBody.hpp)
+set(SNAKE_HEADERS ISnakeStates.hpp Snake.hpp SnakeBody.hpp)
+set(SNAKE_SOURCES Snake.cpp SnakeBody.cpp)
 
-add_executable(Snake ${Snake_Sources} ${Snake_Headers})
-target_include_directories(Snake PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
-set_target_properties(Snake PROPERTIES LINKER_LANGUAGE CXX)
-set_property(TARGET Snake PROPERTY ENABLE_EXPORTS 1)
-
-add_subdirectory(SnakeStates)
+add_library(Snake SHARED ${SNAKE_STATES_HEADERS} ${SNAKE_STATES_SOURCES} ${SNAKE_HEADERS} ${SNAKE_SOURCES})
