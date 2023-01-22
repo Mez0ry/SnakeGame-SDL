@@ -1,10 +1,6 @@
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+set(SUBJECT_HEADERS Subject/Subject.hpp)
+set(SUBJECT_SOURCES Subject/Subject.cpp)
 
-set(Observer_Headers Observer.hpp ObserverEvents.hpp)
+set(OBSERVER_HEADERS Observer.hpp ObserverEvents.hpp)
 
-set(ObserverSubject ${CMAKE_CURRENT_SOURCE_DIR}/Subject/Subject.hpp  ${CMAKE_CURRENT_SOURCE_DIR}/Subject/Subject.cpp)
-
-add_executable(Observer ${Observer_Headers} ${ObserverSubject})
-target_include_directories(Observer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
-set_target_properties(Observer PROPERTIES LINKER_LANGUAGE CXX)
+add_library(Observer SHARED ${SUBJECT_HEADERS} ${SUBJECT_SOURCES} ${OBSERVER_HEADERS})

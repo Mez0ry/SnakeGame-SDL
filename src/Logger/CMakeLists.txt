@@ -1,0 +1,1 @@
+add_library(Logger SHARED Logger.hpp Logger.cpp)

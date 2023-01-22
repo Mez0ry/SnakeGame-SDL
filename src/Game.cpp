@@ -5,15 +5,19 @@ Game::Game() : m_bGameLoop(true)
   CSDLContext::instance().init();
   m_ScenesController.CollectScenes();
   m_ScenesController.TransitionTo(GameSceneType::Menu);
+
+  const std::string& symbol = CAppSettings::instance().get_SlashSymbol();
+	std::string cursor_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "Other" + symbol + "cursor" + symbol + "cursor_default.png";
+  m_CustomCursor.LoadCursor(cursor_texture_path);
 }
 
 Game::~Game()
 {
+
 }
 
 void Game::Play()
 {
-
   while (m_bGameLoop)
   {
     SDL_RenderClear(CSDLContext::instance().get_renderer());

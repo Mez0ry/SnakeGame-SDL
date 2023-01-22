@@ -1,14 +1,9 @@
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+set(ACHIEVEMENTS Achievements/OneHundredScore.hpp Achievements/OneHundredScore.cpp 
+                 Achievements/FiveHundredScore.hpp Achievements/FiveHundredScore.cpp 
+                 Achievements/OneThousandScore.hpp Achievements/OneThousandScore.cpp)
 
-set(AchievementSystem_Sources AchievementSystem.cpp)
-set(AchievementSystem_Headers AchievementSystem.hpp Achievement.hpp)
+set(ACHIEVEMENT_SETTINGS AchievementSettings/AchievementSettings.hpp AchievementSettings/AchievementSettings.cpp)
 
-add_executable(AchievementSystem ${AchievementSystem_Sources} ${AchievementSystem_Headers})
-target_include_directories(AchievementSystem PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+set(ACHIEVEMENT_SYSTEM Achievement.hpp AchievementSystem.hpp AchievementSystem.cpp)
 
-set_target_properties(AchievementSystem PROPERTIES LINKER_LANGUAGE CXX)
-set_property(TARGET AchievementSystem PROPERTY ENABLE_EXPORTS 1)
-
-
-add_subdirectory(Achievements)
-add_subdirectory(AchievementSettings)
+add_library(AchievementSystem SHARED ${ACHIEVEMENTS} ${ACHIEVEMENT_SETTINGS} ${ACHIEVEMENT_SYSTEM})
