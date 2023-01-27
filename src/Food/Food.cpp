@@ -23,7 +23,7 @@ void Food::set_SrcRect(int x, int y, int w, int h) {
 void Food::Update() {
   if(m_pFoodModel->Type == FoodType::InEdible){
     std::chrono::seconds time(RESPAWN_INEDIBLE_FOOD_IN);
-    if(m_Timer.GetDurationInSeconds() >= time.count()){
+    if(m_TimeStamp.GetDurationInSeconds() >= time.count()){
     RespawnNewFood();
     }
   }
@@ -80,7 +80,7 @@ inline void Food::randomizeFoodTexture() {
   std::string food_texture_path;
 
   m_pFoodModel = m_pFoodFlyweight->get_FoodModel(static_cast<FoodName>(food_type(rng)));
-  m_Timer.Start();
+  m_TimeStamp.Start();
 }
 
 bool Food::isColliding(const EntityPosition &pos) {
