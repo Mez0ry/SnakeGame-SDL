@@ -7,7 +7,7 @@
 #include "../GameScore/GameScore.hpp"
 #include "../CollideSystem/CollideSystem.hpp"
 #include "../AchievementSystem/AchievementSystem.hpp"
-#include "../Timer/Timer.hpp"
+#include "../Timestamp/Timestamp.hpp"
 #include <list>
 #include "../Serializer/Serializer.hpp"
 
@@ -36,8 +36,8 @@ private:
   GameScore m_GameScore;
   CollideSystem m_CollideSystem;
   AchievementSystem m_AchievementSystem;
-  Timer m_StartToFinishTimer;
-
+  Utils::Timestamp m_StartToFinishTimestamp;
+  
   std::list<double> m_InGameTimeStack;
 };
 #endif //! SnakeGame_GameScenes_CPLAYING_HPP

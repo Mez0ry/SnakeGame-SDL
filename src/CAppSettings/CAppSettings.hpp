@@ -23,32 +23,33 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "../Timer/Timer.hpp"
+#include "../Timestamp/Timestamp.hpp"
 #include "../Serializer/Serializer.hpp"
 #include "../Logger/Logger.hpp"
 
-class CAppSettings {
- private:
+class CAppSettings
+{
+private:
   Serializer m_Serializer;
 
   std::string m_ConfigPath;
   std::string m_SlashSymbol;
   std::string m_SrcFolderPath;
 
- public:
+public:
   CAppSettings();
   ~CAppSettings();
 
-  static CAppSettings& instance();
+  static CAppSettings &instance();
   /**
    * @brief Deserializing config file
-  */
+   */
   void LoadSettings();
 
-  const std::string& get_SlashSymbol() const { return this->m_SlashSymbol; }
-  const std::string& get_SourceFolder() const { return m_SrcFolderPath; }
+  const std::string &get_SlashSymbol() const { return this->m_SlashSymbol; }
+  const std::string &get_SourceFolder() const { return m_SrcFolderPath; }
 
-  void set_SourceFolder(char* source_folder);
+  void set_SourceFolder(char *source_folder);
 
   int get_WindowHeight() const;
   int get_WindowWidth() const;
@@ -56,6 +57,6 @@ class CAppSettings {
   int get_MapWidth() const;
   bool get_FullScreen() const;
 
- private:
+private:
 };
-#endif  //! SnakeGame_CAppSettings_HPP
+#endif //! SnakeGame_CAppSettings_HPP

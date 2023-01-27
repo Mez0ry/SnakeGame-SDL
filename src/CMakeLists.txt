@@ -2,7 +2,7 @@ set(EXECUTABLE_NAME SnakeGameSDL)
 
 add_subdirectory(CAppSettings)
 add_subdirectory(CSDLContext)
-add_subdirectory(Timer)
+add_subdirectory(Timestamp)
 add_subdirectory(TextureManager)
 add_subdirectory(SpriteAnimation)
 add_subdirectory(SoundManager)
@@ -23,7 +23,7 @@ add_executable(${EXECUTABLE_NAME} main.cpp Game.hpp Game.cpp Map.hpp Map.cpp)
 
 target_link_libraries(${EXECUTABLE_NAME} CAppSettings
                           CSDLContext 
-                          Timer 
+                          Timestamp 
                           TextureManager 
                           SpriteAnimation 
                           SoundManager 

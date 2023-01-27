@@ -42,7 +42,7 @@ CPlaying::~CPlaying() {}
 
 void CPlaying::OnCreate()
 {
-  m_StartToFinishTimer.Start();
+  m_StartToFinishTimestamp.Start();
 
   m_GameScore.OnCreate();
   m_Map.OnCreate();
@@ -65,7 +65,7 @@ void CPlaying::OnDestroy()
   m_Snake.OnDestroy();
   m_GameScore.OnDestroy();
 
-  double time_in_game = m_StartToFinishTimer.GetDurationInSeconds();
+  double time_in_game = m_StartToFinishTimestamp.GetDurationInSeconds();
   m_InGameTimeStack.push_front(time_in_game / 60);
 
   const std::string &symbol = CAppSettings::instance().get_SlashSymbol();

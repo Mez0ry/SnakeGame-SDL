@@ -2,16 +2,17 @@
 #define SnakeGame_ACHIEVEMENT_SYSTEM_HPP
 #include "../Observer/Observer.hpp"
 
-#include <unordered_map>
 #include <iostream>
 #include <variant>
-#include <vector>
-
-#include "AchievementSettings/AchievementSettings.hpp"
+#include <unordered_map>
+#include <filesystem>
+#include <queue>
+#include "Achievement/Achievement.hpp"
+#include "../Serializer/Serializer.hpp"
 
 class AchievementSystem : public Observer {
   private: 
-  using AchievementMapType = std::unordered_map<ObserverEvents,bool>;
+  using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
 public:
   AchievementSystem();
   ~AchievementSystem();
@@ -21,10 +22,7 @@ public:
   
   void onNotify(const Entity &entity, ObserverEvents event) override;
 private:
-  std::vector<AchievementInternal::var_t> m_AchievementsVec;
-  OneHundredScore m_OneHundredScore; 
-  FiveHundredScore m_FiveHundredScore;
-  OneThousandScore m_OneThousandScore;
-  AchievementSettings m_AchievementSettings;
+  std::unordered_map<std::string,std::shared_ptr<Achievement>> m_AchievesMap;
+  std::queue<std::shared_ptr<Achievement>> m_CurrentAchieveProccessing;
 };
 #endif //! SnakeGame_ACHIEVEMENT_SYSTEM_HPP

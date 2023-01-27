@@ -47,6 +47,6 @@ private:
   EntityPosition m_Position;
   SquareType **m_MapState;
   std::shared_ptr<FoodFlyweight> m_pFoodFlyweight;
-  Timer m_Timer;
+  Utils::Timestamp m_TimeStamp;
 };
 #endif //! SnakeGame_FOOD_HPP

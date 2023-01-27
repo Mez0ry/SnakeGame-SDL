@@ -1,0 +1,1 @@
+add_library(Timestamp SHARED Timestamp.hpp Timestamp.cpp)

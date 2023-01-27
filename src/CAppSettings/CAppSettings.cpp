@@ -16,7 +16,7 @@ CAppSettings &CAppSettings::instance()
 
 void CAppSettings::LoadSettings()
 {
-  Timer FunctionTimer;
+  Utils::Timestamp timestamp;
   m_ConfigPath = m_SrcFolderPath + m_SlashSymbol + "CAppSettings" + m_SlashSymbol + "AppConfig" + m_SlashSymbol + "config.cfg";
 
   auto &module_context = LOG_INSTANCE["CAppSettings"];
@@ -51,7 +51,7 @@ void CAppSettings::LoadSettings()
     function_context.GetContent("fullscreen_mode").SetFormat(settings_format);
   }
 
-  function_context.SetExecutionTime(FunctionTimer.GetDurationInMs(), "ms");
+  function_context.SetExecutionTime(timestamp.GetDurationInMs(), "ms");
   LOG_INSTANCE.PrintModule(module_context);
 }
 
@@ -114,6 +114,6 @@ void CAppSettings::set_SourceFolder(char *source_folder)
   };
 
   std::string tmp_str = source_folder;
-  this->m_SrcFolderPath = correct_path(tmp_str);
+  this->m_SrcFolderPath = "/home/mezory/Documents/Repositories/SnakeGameSDLnew/src";//correct_path(tmp_str);
 }
 #endif // __CAPPSETTINGS_H__

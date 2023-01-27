@@ -16,7 +16,7 @@ CSDLContext::~CSDLContext()
 
 void CSDLContext::init()
 {
-  Timer FunctionTimer;
+  Utils::Timestamp timestamp;
   
   auto& module_context = LOG_INSTANCE["CSDLContext"];
   auto& function_context = module_context.GetMethod(LOG_FUNCTION_NAME);
@@ -85,7 +85,7 @@ void CSDLContext::init()
     function_context.GetContent("SDL_GetWindowSurface").SetFormat(SDL_func_format);
   }
 
-  function_context.SetExecutionTime(FunctionTimer.GetDurationInSeconds(),"sec");
+  function_context.SetExecutionTime(timestamp.GetDurationInSeconds(),"sec");
   LOG_INSTANCE.PrintModule(module_context);
 }
 
