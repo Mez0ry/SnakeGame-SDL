@@ -4,7 +4,6 @@
 #include "../Map.hpp"
 #include "../TextureManager/TextureManager.hpp"
 #include <random>
-#include "../Snake/ISnakeStates.hpp"
 #include "FoodFlyweight/FoodFlyweight.hpp"
 /** Entity base class*/
 #include "../Entity/Entity.hpp"
