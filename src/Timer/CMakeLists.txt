@@ -1,1 +1,0 @@
-add_library(Timer SHARED Timer.hpp Timer.cpp)
