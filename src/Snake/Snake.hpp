@@ -2,25 +2,18 @@
 #define SnakeGame_SNAKE_HPP
 #include "../CSDLContext/CSDLContext.hpp"
 #include "../Map.hpp"
-#include "ISnakeStates.hpp"
 #include "SDL2/SDL.h"
-/**SnakeStates*/
-#include "SnakeStates/IdleState.hpp"
-#include "SnakeStates/MovingState.hpp"
-/**SnakeStates Controller*/
-#include "SnakeStates/SnakeStatesController.hpp"
+#include "SnakeModel.hpp"
+
 /** SnakeBody*/
 #include "SnakeBody.hpp"
 
-#include "../SpriteAnimation/SpriteAnimation.hpp"
+#include "SnakeCommands/MoveTo.hpp"
+
 
 class Snake : public Entity {
 private:
   SquareType **m_MapState;
-  EntityPosition m_SnakePosition;
-  Snake_State m_SnakeState;
-  SnakeStatesController m_SnakeStatesController;
-
 public:
   Snake();
   ~Snake();
@@ -34,12 +27,20 @@ public:
 
   bool isPlayer() const override { return true; }
 
-  void set_MapState(SquareType **map_state) { this->m_MapState = map_state; }
-  Snake_State &get_SnakeState() { return m_SnakeState; }
-  const EntityPosition &get_PositionOnMap() const override {return m_SnakePosition;}
+  void set_MapState(SquareType **map_state) { this->m_MapState = map_state; m_MoveToCommand.set_MapState(map_state); }
+  void set_MoveDir(MoveDir dir) {
+    m_MoveDir = dir;
+  }
 
+  void GrowBody(){
+    m_SnakeBody.AddLength();
+  }
+
+  const EntityPosition &get_PositionOnMap() const override {return m_Model.m_SnakePosition;}
 private:
-  SDL_Event m_event;
   SnakeBody m_SnakeBody;
+  SnakeModel m_Model;
+  MoveDir m_MoveDir;
+  MoveTo m_MoveToCommand;
 };
 #endif //! SnakeGame_SNAKE_HPP

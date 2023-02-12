@@ -4,8 +4,9 @@
 #include "../SoundManager/SoundManager.hpp"
 #include "../TextureManager/TextureManager.hpp"
 #include "../Map.hpp"
-#include "ISnakeStates.hpp"
+#include "../Entity/Entity.hpp"
 #include <deque>
+
 class SnakeBody {
 private:
 	TextureManager m_SnakeBodyTexture;

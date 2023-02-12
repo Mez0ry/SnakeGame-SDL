@@ -102,20 +102,16 @@ void CPlaying::InputHandler()
       switch (m_event.key.keysym.sym)
       {
       case SDLK_LEFT:
-        m_Snake.get_SnakeState().moving.move_dir = MoveDir::LEFT;
-        m_Snake.get_SnakeState().type = SNAKE_MOVING_STATE;
+        m_Snake.set_MoveDir(MoveDir::LEFT);
         break;
       case SDLK_RIGHT:
-        m_Snake.get_SnakeState().moving.move_dir = MoveDir::RIGHT;
-        m_Snake.get_SnakeState().type = SNAKE_MOVING_STATE;
+         m_Snake.set_MoveDir(MoveDir::RIGHT);
         break;
       case SDLK_UP:
-        m_Snake.get_SnakeState().moving.move_dir = MoveDir::UP;
-        m_Snake.get_SnakeState().type = SNAKE_MOVING_STATE;
+        m_Snake.set_MoveDir(MoveDir::UP);
         break;
       case SDLK_DOWN:
-        m_Snake.get_SnakeState().moving.move_dir = MoveDir::DOWN;
-        m_Snake.get_SnakeState().type = SNAKE_MOVING_STATE;
+        m_Snake.set_MoveDir(MoveDir::DOWN);
         break;
       case SDLK_r:
       {
@@ -144,7 +140,7 @@ void CPlaying::Update()
 
     if (m_CollideSystem.IsColliding(m_Snake, m_food[i]))
     {
-      m_Snake.get_SnakeState().type = SNAKE_GROW_STATE;
+      m_Snake.GrowBody();
     }
   }
 
