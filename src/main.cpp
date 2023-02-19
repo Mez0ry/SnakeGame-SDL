@@ -1,7 +1,6 @@
-#include "CAppSettings/CAppSettings.hpp"
 #include "Game.hpp"
-#include <iostream>
- 
+#include "CAppSettings/CAppSettings.hpp"
+
 int main(int agrc, char **argv) {
   char source_folder_path[FILENAME_MAX];
 

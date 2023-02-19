@@ -2,6 +2,7 @@
 #define SNAKE_GAME_MOVE_TO_COMMAND_HPP
 #include "Command.hpp"
 #include "../../Map.hpp"
+#include "../../GameScenes/GameScene.hpp"
 
 class MoveTo : public Command {
 private:
@@ -46,14 +47,14 @@ public:
     }
     } //! switch
 
-    model.m_SnakeTextures[model.m_TextureDrawIndex].set_dstRect(MapUtils::CorrectWidthPosOnTheMap(model.m_SnakePosition.x),MapUtils::CorrectHeightPosOnTheMap(model.m_SnakePosition.y), TextureConstants::TextureWidth, TextureConstants::TextureHeight);
+    model.m_SnakeTextures[model.m_TextureDrawIndex].set_Rect((model.m_SnakePosition.x * model.m_SnakeTextures[0].get_Rect<SourceRect>().w) + CAppSettings::instance().get_WindowWidth() / CAppSettings::instance().get_MapWidth() , (model.m_SnakePosition.y * model.m_SnakeTextures[0].get_Rect<SourceRect>().h) + CAppSettings::instance().get_WindowWidth() / CAppSettings::instance().get_MapWidth(),  32, 32);
 
     if (SnakeIsOutOfMap(model)) {
       g_GameSceneType = GameSceneType::Menu;
       return;
     }
-
-    m_MapState[model.m_PrevSnakePosition.y][model.m_PrevSnakePosition.x] =SquareType::BACKGROUND;
+    
+    m_MapState[model.m_PrevSnakePosition.y][model.m_PrevSnakePosition.x] = SquareType::BACKGROUND;
 
     m_MapState[model.m_SnakePosition.y][model.m_SnakePosition.x] = SquareType::ENTITY;
   }

@@ -1,13 +1,13 @@
 #ifndef SnakeGame__FOOD_FLYWEIGHT_HPP
 #define SnakeGame__FOOD_FLYWEIGHT_HPP
-#include "../../TextureManager/TextureManager.hpp"
+#include "../../Texture/Texture.hpp"
 #include <memory>
 enum class FoodName { APPLE = 0, WATER_MELON, STAR_FRUIT, BURGER, HOTDOG, STEAK };
 
 enum class FoodType { InEdible, Edible };
 
 typedef struct FoodModel {
-  TextureManager Texture;
+  Texture texture;
   int PointsForFood;
   FoodType Type;
 } FoodModel;

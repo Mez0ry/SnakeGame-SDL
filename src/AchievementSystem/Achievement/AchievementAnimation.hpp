@@ -5,6 +5,7 @@
 #include <chrono>
 #include <functional>
 #include <queue>
+#include <memory>
 #include "../../Timestamp/Timestamp.hpp"
 
 class Task{

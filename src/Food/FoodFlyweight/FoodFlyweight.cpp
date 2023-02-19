@@ -10,12 +10,12 @@ void FoodFlyweight::AddFood(FoodName name, FoodType type, int points_for_food, c
     FoodModel model;
     model.PointsForFood = points_for_food;
     model.Type = type;
-    model.Texture.set_dstRect(0,0,32,32);
-    model.Texture.set_srcRect(0,0,32,32);
+    model.texture.set_Rect(0,0,32,32);
+    model.texture.set_Rect<SourceRect>(0,0,32,32);
     
     m_FoodMap.insert(std::make_pair(name, std::make_shared<FoodModel>(model)));
 
-    m_FoodMap.at(name)->Texture.LoadTexture(texture_path);
+    m_FoodMap.at(name)->texture.LoadTexture(texture_path);
   }
 
 }

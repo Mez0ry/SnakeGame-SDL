@@ -8,8 +8,8 @@ Map::Map() : m_Map(nullptr)
 		m_Map[write_index] = new SquareType[CAppSettings::instance().get_MapWidth()];
 	}
 
-	m_MapTexture.set_srcRect(0, 0, TextureConstants::TextureWidth, TextureConstants::TextureHeight);
-	m_MapTexture.set_dstRect(0, 0, TextureConstants::TextureWidth, TextureConstants::TextureHeight);
+	m_MapTexture.set_Rect<SourceRect>(0, 0, 32, 32);
+	m_MapTexture.set_Rect(0, 0, 32, 32);
 
 	const std::string& symbol = CAppSettings::instance().get_SlashSymbol();
 	std::string map_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "map" + symbol + "map_texture.png";
@@ -49,9 +49,9 @@ void Map::Render()
 			square_type = m_Map[row_index][col_index];
 			switch (square_type)
 			{
-			case static_cast<SquareType>(SquareType::BACKGROUND):
+			case SquareType::BACKGROUND:
 			{
-				m_MapTexture.set_dstRect(MapUtils::CorrectWidthPosOnTheMap(col_index), MapUtils::CorrectHeightPosOnTheMap(row_index), TextureConstants::TextureWidth, TextureConstants::TextureHeight);
+				m_MapTexture.set_Rect((col_index * m_MapTexture.get_Rect<SourceRect>().w) + CAppSettings::instance().get_WindowWidth() / CAppSettings::instance().get_MapWidth(),(row_index * m_MapTexture.get_Rect<SourceRect>().h) + CAppSettings::instance().get_WindowWidth() / CAppSettings::instance().get_MapWidth(), 32, 32);
 				m_MapTexture.RenderTexture();
 				break;
 			}

@@ -1,7 +1,7 @@
 #ifndef SnakeGame_SNAKE_MODEL_HPP
 #define SnakeGame_SNAKE_MODEL_HPP
 #include <cstdint>
-#include "../TextureManager/TextureManager.hpp"
+#include "../Texture/Texture.hpp"
 #include "../Entity/Entity.hpp"
 
 enum class MoveDir : uint8_t
@@ -16,7 +16,7 @@ enum class MoveDir : uint8_t
 struct SnakeModel{
   EntityPosition m_SnakePosition;
   EntityPosition m_PrevSnakePosition;
-  TextureManager m_SnakeTextures[4];
+  Texture m_SnakeTextures[4];
   int m_TextureDrawIndex = -1;
 };
 

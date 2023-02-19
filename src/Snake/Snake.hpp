@@ -10,7 +10,6 @@
 
 #include "SnakeCommands/MoveTo.hpp"
 
-
 class Snake : public Entity {
 private:
   SquareType **m_MapState;

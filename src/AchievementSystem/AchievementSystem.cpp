@@ -4,15 +4,6 @@ AchievementSystem::AchievementSystem() {
   const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
   std::string achievement_dir_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "Achievements";
 
-  auto get_image_type = [](const std::string &file_extension) -> ImageType {
-    if (file_extension == ".png") {
-      return ImageType::PNG;
-    } else if (file_extension == ".bmp") {
-      return ImageType::BMP;
-    }
-    return static_cast<ImageType>(-1);
-  };
-
   int achievement_posX = CAppSettings::instance().get_WindowWidth() / 4;
   int achievement_posY = CAppSettings::instance().get_WindowHeight();
 
@@ -27,9 +18,9 @@ AchievementSystem::AchievementSystem() {
     file_name      = file_name.substr(0, file_name.find_last_of("."));
 
     m_AchievesMap.insert(std::make_pair(file_name, std::make_shared<Achievement>()));
-    m_AchievesMap.at(file_name)->LoadTexture( path.string(), get_image_type(file_extension), 527, 125);
+    m_AchievesMap.at(file_name)->LoadTexture( path.string(), 527, 125);
     m_AchievesMap.at(file_name)->AddAnimation( std::make_unique<DefaultAnimation>());
-
+  
     m_AchievesMap.at(file_name)->SetAchievementAlphaMod(230);
 
     m_AchievesMap.at(file_name)->set_dstRect(achievement_posX, achievement_posY,  527, 125);

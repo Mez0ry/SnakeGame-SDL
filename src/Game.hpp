@@ -2,7 +2,6 @@
 #define SnakeGame_GAME_HPP
 #include "CSDLContext/CSDLContext.hpp"
 #include "GameScenes/GameScenesController.hpp"
-#include "SoundManager/SoundManager.hpp"
 
 typedef struct CustomCursor {
   CustomCursor() : m_Cursor(nullptr){}

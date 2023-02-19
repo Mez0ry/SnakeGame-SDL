@@ -2,7 +2,6 @@
 #define SnakeGame_FOOD_HPP
 #include "../CSDLContext/CSDLContext.hpp"
 #include "../Map.hpp"
-#include "../TextureManager/TextureManager.hpp"
 #include <random>
 #include "FoodFlyweight/FoodFlyweight.hpp"
 /** Entity base class*/

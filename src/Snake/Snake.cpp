@@ -18,8 +18,8 @@ Snake::Snake() : m_MapState(nullptr)
   const int snake_texture_size = 4;
   for (int i = 0; i < snake_texture_size; i++)
   {
-    m_Model.m_SnakeTextures[i].set_dstRect(0, 0, TextureConstants::TextureWidth, TextureConstants::TextureHeight);
-    m_Model.m_SnakeTextures[i].set_srcRect(0, 0, TextureConstants::TextureWidth, TextureConstants::TextureHeight);
+    m_Model.m_SnakeTextures[i].set_Rect(0, 0, 32, 32);
+    m_Model.m_SnakeTextures[i].set_Rect<SourceRect>(0, 0, 32, 32);
   }
   
 }
@@ -32,7 +32,7 @@ void Snake::OnCreate()
 {
   m_Model.m_SnakePosition.x = CAppSettings::instance().get_MapWidth() / 2;
   m_Model.m_SnakePosition.y = CAppSettings::instance().get_MapHeight() / 2;
-  m_Model.m_SnakeTextures[m_Model.m_TextureDrawIndex].set_dstRect(MapUtils::CorrectWidthPosOnTheMap(m_Model.m_SnakePosition.x),MapUtils::CorrectHeightPosOnTheMap(m_Model.m_SnakePosition.y), TextureConstants::TextureWidth, TextureConstants::TextureHeight);
+  m_Model.m_SnakeTextures[m_Model.m_TextureDrawIndex].set_Rect(m_Model.m_SnakePosition.x * m_Model.m_SnakeTextures[0].get_Rect<SourceRect>().w + CAppSettings::instance().get_WindowWidth() / CAppSettings::instance().get_MapWidth(),m_Model.m_SnakePosition.y * m_Model.m_SnakeTextures[0].get_Rect<SourceRect>().h + CAppSettings::instance().get_WindowWidth() / CAppSettings::instance().get_MapWidth(), 32, 32);
   m_SnakeBody.Reset();
   m_MoveDir = MoveDir::UNKNOWN;
 }

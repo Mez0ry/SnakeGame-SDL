@@ -1,1 +1,0 @@
-add_library(TextureManager SHARED TextureManager.hpp TextureManager.cpp)

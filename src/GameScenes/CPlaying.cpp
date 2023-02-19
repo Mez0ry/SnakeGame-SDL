@@ -88,7 +88,7 @@ void CPlaying::OnDestroy()
 
 void CPlaying::InputHandler()
 {
-  if (SDL_PollEvent(&m_event))
+  while (SDL_PollEvent(&m_event))
   {
     switch (m_event.type)
     {

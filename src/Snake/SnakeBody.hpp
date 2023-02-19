@@ -1,15 +1,14 @@
 #ifndef SnakeGame_SNAKE_BODY_HPP
 #define SnakeGame_SNAKE_BODY_HPP
 #include "../CSDLContext/CSDLContext.hpp"
-#include "../SoundManager/SoundManager.hpp"
-#include "../TextureManager/TextureManager.hpp"
+#include "../Texture/Texture.hpp"
 #include "../Map.hpp"
 #include "../Entity/Entity.hpp"
 #include <deque>
 
 class SnakeBody {
 private:
-	TextureManager m_SnakeBodyTexture;
+	Texture m_SnakeBodyTexture;
 	SquareType** m_MapState;
 public:
 	SnakeBody();

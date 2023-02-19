@@ -9,15 +9,15 @@ Food::~Food() {
 
 void Food::LoadTexture(const char *path) {
   std::string texture_path = path;
-  m_pFoodModel->Texture.LoadTexture(texture_path);
+  m_pFoodModel->texture.LoadTexture(texture_path);
 }
 
 void Food::set_DstRect(int x, int y, int w, int h) {
-  m_pFoodModel->Texture.set_dstRect(x, y, w, h);
+  m_pFoodModel->texture.set_Rect(x, y, w, h);
 }
 
 void Food::set_SrcRect(int x, int y, int w, int h) {
-  m_pFoodModel->Texture.set_srcRect(x, y, w, h);
+  m_pFoodModel->texture.set_Rect<SourceRect>(x, y, w, h);
 }
 
 void Food::Update() {
@@ -35,9 +35,9 @@ void Food::Render() {
 
   m_MapState[m_Position.y][m_Position.x] = SquareType::ENTITY;
   
-  m_pFoodModel->Texture.set_dstRect(MapUtils::CorrectWidthPosOnTheMap(m_Position.x),MapUtils::CorrectHeightPosOnTheMap(m_Position.y), TextureConstants::TextureWidth, TextureConstants::TextureHeight);
+  m_pFoodModel->texture.set_Rect(m_Position.x * m_pFoodModel->texture.get_Rect<SourceRect>().w + CAppSettings::instance().get_WindowWidth() / CAppSettings::instance().get_MapWidth(),m_Position.y* m_pFoodModel->texture.get_Rect<SourceRect>().h + CAppSettings::instance().get_WindowWidth() / CAppSettings::instance().get_MapWidth(),32,32);
 
-  m_pFoodModel->Texture.RenderTexture();
+  m_pFoodModel->texture.RenderTexture();
 }
 
 void Food::set_MapState(SquareType **map_state) {

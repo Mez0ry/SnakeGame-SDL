@@ -2,9 +2,10 @@
 #define SnakeGame_GameScenes_CPAUSE_HPP
 #include "../CAppSettings/CAppSettings.hpp"
 #include "../CSDLContext/CSDLContext.hpp"
-#include "../TextureManager/TextureManager.hpp"
-#include "../FontManager/FontManager.hpp"
+#include "../Texture/Texture.hpp"
+#include "../GUI/Text/Text.hpp"
 #include "GameScene.hpp"
+
 class CPause : public GameScene {
 public:
   CPause();
@@ -23,7 +24,7 @@ public:
   }
 
 private:
-  TextureManager m_BackgroundTexture;
-  FontManager m_PauseText;
+  Texture m_BackgroundTexture;
+  Text m_PauseText;
 };
 #endif //! SnakeGame_GameScenes_CPAUSE_HPP
