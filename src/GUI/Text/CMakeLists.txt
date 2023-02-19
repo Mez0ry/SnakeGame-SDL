@@ -1,0 +1,1 @@
+add_library(Text SHARED Text.hpp Text.cpp)
