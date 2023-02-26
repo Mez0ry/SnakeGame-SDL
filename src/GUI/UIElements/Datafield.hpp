@@ -73,6 +73,8 @@ public:
   const DataModel &GetData(unsigned int index) {
     return m_Data[index];
   }
+  
+  bool DataIsEmpty() const {return m_Data.empty();}
 
   void SetBackgroundPosition(const Vec2 &position) {
     m_BackgroundTexture.set_Rect(position.x, position.y,m_BackgroundTexture.get_Rect().w, m_BackgroundTexture.get_Rect().h);
