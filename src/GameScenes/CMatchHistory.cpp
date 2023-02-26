@@ -22,7 +22,7 @@ CMatchHistory::CMatchHistory() {
 
   // Return button
   m_ReturnButton.LoadTexture(texture_path.c_str());
-
+  
   int width = CAppSettings::instance().get_WindowWidth() / 26;
   int height = CAppSettings::instance().get_WindowHeight() / 26;
 
@@ -66,8 +66,8 @@ void CMatchHistory::OnCreate() {
 
     const int new_added_elem_index = 0;
     if (time_property.get_DataSize() > m_InGameTimeVec.size() && score_property.get_DataSize() > m_ScoreVec.size()) {
-      m_InGameTimeVec.push_back(time_property.get_Double(new_added_elem_index));
-      m_ScoreVec.push_back(score_property.get_Int(new_added_elem_index));
+      m_InGameTimeVec.push_back(time_property.GetAs<double>(new_added_elem_index));
+      m_ScoreVec.push_back(score_property.GetAs<int>(new_added_elem_index));
     }
   }
 
@@ -103,13 +103,10 @@ void CMatchHistory::OnCreate() {
     m_DataFields.back().LoadBackgroundTexture(
         texture_path, data_field_source_width, data_field_source_height);
     m_DataFields.back().SetSpaceBetweenText(115);
-    m_DataFields.back().AddContent(
-        DataModel(std::to_string(m_DataFields.size()), 20, data_color));
-    m_DataFields.back().AddContent(DataModel(
-        std::to_string(m_ScoreVec[m_ScoreVec.size() - 1]), 20, data_color));
+    m_DataFields.back().AddContent(DataModel(std::to_string(m_DataFields.size()), 20, data_color));
+    m_DataFields.back().AddContent(DataModel(std::to_string(m_ScoreVec[m_ScoreVec.size() - 1]), 20, data_color));
 
-    std::string str =
-        std::to_string(m_InGameTimeVec[m_InGameTimeVec.size() - 1]);
+    std::string str = std::to_string(m_InGameTimeVec[m_InGameTimeVec.size() - 1]);
 
     // Deletes decimal part and leaves the fractional
     fnDelete_decimal_part(str);
