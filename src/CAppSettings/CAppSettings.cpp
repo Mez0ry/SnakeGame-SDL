@@ -47,7 +47,7 @@ void CAppSettings::LoadSettings()
     function_context.AddContent("map_width", MESSAGE_SUCCESS(std::to_string(get_MapWidth())));
     function_context.GetContent("map_width").SetFormat(settings_format);
 
-    function_context.AddContent("fullscreen_mode", MESSAGE_SUCCESS(m_Serializer["SnakeGame-SDL Settings"]["fullscreen_mode"].get_String(0)));
+    function_context.AddContent("fullscreen_mode", MESSAGE_SUCCESS(m_Serializer["SnakeGame-SDL Settings"]["fullscreen_mode"].GetAs<std::string>(0)));
     function_context.GetContent("fullscreen_mode").SetFormat(settings_format);
   }
 
@@ -57,27 +57,27 @@ void CAppSettings::LoadSettings()
 
 int CAppSettings::get_WindowHeight() const
 {
-  return m_Serializer["SnakeGame-SDL Settings"]["window_height"].get_Int(0);
+  return m_Serializer["SnakeGame-SDL Settings"]["window_height"].GetAs<int>(0);
 }
 
 int CAppSettings::get_WindowWidth() const
 {
-  return m_Serializer["SnakeGame-SDL Settings"]["window_width"].get_Int(0);
+  return m_Serializer["SnakeGame-SDL Settings"]["window_width"].GetAs<int>(0);
 }
 
 int CAppSettings::get_MapHeight() const
 {
-  return m_Serializer["SnakeGame-SDL Settings"]["map_height"].get_Int(0);
+  return m_Serializer["SnakeGame-SDL Settings"]["map_height"].GetAs<int>(0);
 }
 
 int CAppSettings::get_MapWidth() const
 {
-  return m_Serializer["SnakeGame-SDL Settings"]["map_width"].get_Int(0);
+  return m_Serializer["SnakeGame-SDL Settings"]["map_width"].GetAs<int>(0);
 }
 
 bool CAppSettings::get_FullScreen() const
 {
-  return m_Serializer["SnakeGame-SDL Settings"]["fullscreen_mode"].get_Bool(0);
+  return m_Serializer["SnakeGame-SDL Settings"]["fullscreen_mode"].GetAs<bool>(0);
 }
 
 void CAppSettings::set_SourceFolder(char *source_folder)
@@ -100,7 +100,6 @@ void CAppSettings::set_SourceFolder(char *source_folder)
     std::string last_word = get_last_word(cpy_str);
     if (last_word == "build")
     {
-
       size_t last_occurence_index = cpy_str.find_last_of(m_SlashSymbol);
       res = cpy_str.substr(0, last_occurence_index);
       res += m_SlashSymbol + std::string("src");
@@ -114,6 +113,6 @@ void CAppSettings::set_SourceFolder(char *source_folder)
   };
 
   std::string tmp_str = source_folder;
-  this->m_SrcFolderPath = "/home/mezory/Documents/Repositories/SnakeGameSDLnew/src";//correct_path(tmp_str);
+  this->m_SrcFolderPath = correct_path(tmp_str);
 }
 #endif // __CAPPSETTINGS_H__
