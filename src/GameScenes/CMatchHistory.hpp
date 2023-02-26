@@ -8,9 +8,9 @@
 #include "../GUI/Text/Text.hpp"
 #include "../GUI/UIElements/Datafield.hpp"
 #include "../GUI/InertialScroll/InertialScroll.hpp"
-#include <queue>
 #include "../Serializer/Serializer.hpp"
 #include "../Vector.hpp"
+#include <vector>
 
 class CMatchHistory : public GameScene
 {
@@ -32,10 +32,9 @@ private:
     Texture m_MatchBoardTexture;
 
     InertialScroll m_InertialScroll;
-    Datafield *m_DataFields;
-    std::queue<int> m_ScoreQueue;
-    std::queue<double> m_InGameTime;
-
-    int m_FieldsSize = 0;
+    
+    std::vector<Datafield> m_DataFields;
+    std::vector<int> m_ScoreVec;
+    std::vector<double> m_InGameTimeVec;
 };
 #endif //! SnakeGame_GameScenes_CSTATS_HPP
