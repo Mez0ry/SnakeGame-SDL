@@ -34,7 +34,7 @@ AchievementSystem::AchievementSystem() {
 
       auto& node = des[key.first];
       auto& unlocked_property = node["Unlocked"];
-      key.second->set_isUnlocked(unlocked_property.get_Bool(0));
+      key.second->set_isUnlocked(unlocked_property.GetAs<bool>(0));
     }
   }
   
@@ -48,7 +48,7 @@ AchievementSystem::~AchievementSystem() {
     for (auto &key : m_AchievesMap) {
       auto &node = ser[key.first];
       auto &unlocked_property = node["Unlocked"];
-      unlocked_property.set_Bool(key.second->isUnlocked());
+      unlocked_property.SetAs<bool>(key.second->isUnlocked());
     }
 
     Serializer::Serialize(ser, achievement_config_path);
