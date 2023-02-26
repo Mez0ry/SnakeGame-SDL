@@ -34,7 +34,7 @@ void GameScore::OnDestroy()
   int write_index = 0;
   
   for(auto it = m_GamesScore.begin(); it != m_GamesScore.end();it++,write_index++){
-      score_property.set_Int(*it,write_index);
+      score_property.SetAs<int>(*it,write_index);
   }
   
   Serializer::Serialize(ser,file_path);
