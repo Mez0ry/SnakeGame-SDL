@@ -21,20 +21,21 @@ public:
   void LoadBgTexture(const std::string &bg_path, const SDL_Rect &source_rect) {
 
     m_BgProgressTexture.LoadTexture(bg_path);
-    m_BgProgressTexture.set_Rect<SourceRect>(source_rect.x, source_rect.y, source_rect.w, source_rect.h);
+    m_BgProgressTexture.SetRect<SourceRect>({source_rect.x, source_rect.y}, TextureSize(source_rect.w, source_rect.h));
   }
 
   void LoadFgTexture(const std::string &fg_path, const SDL_Rect &source_rect) {
     m_FgProgressTexture.LoadTexture(fg_path);
-    m_FgProgressTexture.set_Rect<SourceRect>(source_rect.x, source_rect.y, source_rect.w, source_rect.h);
+    m_FgProgressTexture.SetRect<SourceRect>({source_rect.x, source_rect.y}, TextureSize(source_rect.w, source_rect.h));
   }
 
   void SetPosition(const Vec2 &position) {
-    m_BgProgressTexture.set_Rect(position.x, position.y, m_BgProgressTexture.get_Rect().w, m_BgProgressTexture.get_Rect().h);
+    m_BgProgressTexture.SetTexturePosition(position);
+    m_BgProgressTexture.SetRect({position.x, position.y}, TextureSize(m_BgProgressTexture.GetTextureSize().GetWidth(), m_BgProgressTexture.GetTextureSize().GetHeight()));
   }
 
-  void SetSize(const Vec2 &size) {
-    m_BgProgressTexture.set_Rect(m_BgProgressTexture.get_Rect().x, m_BgProgressTexture.get_Rect().y, size.x, size.y);
+  void SetSize(const TextureSize &size) {
+   m_BgProgressTexture.SetTextureSize(size);
   }
 
   ~ProgressBar() {}
@@ -47,15 +48,15 @@ public:
 
     if (GetProgress() < m_ProccessingPercent.top()) {
       m_FgWidth += m_pEasingFunction(m_Easing, m_EaseProgress);
-      m_FgProgressTexture.set_Rect(m_BgProgressTexture.get_Rect().x,m_BgProgressTexture.get_Rect().y, m_FgWidth, m_BgProgressTexture.get_Rect().h);
+      m_FgProgressTexture.SetRect({m_BgProgressTexture.GetTexturePosition().x,m_BgProgressTexture.GetTexturePosition().y}, TextureSize(m_FgWidth, m_BgProgressTexture.GetTextureSize().GetHeight()));
     } else {
       m_ProccessingPercent.pop();
       m_EaseProgress = 0;
     }
-
-    if (m_FgProgressTexture.get_Rect().x + m_FgProgressTexture.get_Rect().w >= m_BgProgressTexture.get_Rect().x + m_BgProgressTexture.get_Rect().w) {
+    //m_FgProgressTexture.GetTexturePosition().x + m_FgProgressTexture.get_Rect().w  
+    if (m_FgProgressTexture.top_right().x >= m_BgProgressTexture.top_right().x) {
       m_FgWidth = 0;
-      m_FgProgressTexture.set_Rect(m_BgProgressTexture.get_Rect().x, m_BgProgressTexture.get_Rect().y, m_BgProgressTexture.get_Rect().w, m_BgProgressTexture.get_Rect().h);
+      m_FgProgressTexture.SetRect({m_BgProgressTexture.GetTexturePosition().x, m_BgProgressTexture.GetTexturePosition().y}, TextureSize(m_BgProgressTexture.GetTextureSize().GetWidth(), m_BgProgressTexture.GetTextureSize().GetHeight()));
     }
   }
 
@@ -71,10 +72,10 @@ public:
 
   /**
    * @return percent of how much progress bar filled at the moment
-   */
+  */
   int GetProgress() {
-    const SDL_Rect &fg_rect = m_FgProgressTexture.get_Rect();
-    const SDL_Rect &bg_rect = m_BgProgressTexture.get_Rect();
+    const SDL_Rect &fg_rect = m_FgProgressTexture.GetRect();
+    const SDL_Rect &bg_rect = m_BgProgressTexture.GetRect();
     double filled_percent = 0;
 
     double bg_width = bg_rect.w, fg_width = fg_rect.w;
@@ -84,6 +85,19 @@ public:
     return (int)filled_percent;
   }
 
+  bool isChanged() {
+    if((GetProgress() != m_TotalPercent)){
+      m_IsChanged = true;
+      return m_IsChanged;
+    }else{
+      if(m_IsChanged){
+        m_IsChanged = false;
+        return true;
+      }
+      return false;
+    }
+  }
+
 private:
   const int m_Maximum = 100;
   int m_TotalPercent;
@@ -91,6 +105,7 @@ private:
   Texture m_BgProgressTexture;
   Texture m_FgProgressTexture;
   int m_FgWidth = 0;
+  bool m_IsChanged = false;
 
   Easing m_Easing;
   double m_EaseProgress = 0;

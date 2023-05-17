@@ -27,7 +27,9 @@ public:
     return (item_idx >= m_vecData.size()) ? "" : m_vecData[item_idx].c_str();
   }
   
-  inline size_t get_DataSize() const { return m_vecData.size(); }
+  inline size_t get_DataSize() const { return m_vecData.size();}
+
+  inline size_t GetObjectsSize() const {return m_VecObjs.size();}
 
   inline Serializer &operator[](const std::string &name) {
     if (m_MapObjs.count(name) == 0) {
@@ -45,6 +47,18 @@ public:
       m_VecObjs.push_back({name, Serializer()});
     }
     return m_VecObjs[m_MapObjs[name]].second;
+  }
+  /**
+   * @brief be careful when using this overload (inefficent)
+  */
+  inline Serializer &operator[](const int index) {
+    if(index >= m_MapObjs.size()){
+      throw std::out_of_range("attempt to access element that doesnt exists");
+    }
+
+    auto it = m_MapObjs.begin();
+    std::advance(it,index);
+    return m_VecObjs[it->second].second;
   }
 
   inline static bool Serialize(const Serializer &serializer,

@@ -6,8 +6,7 @@ Game::Game() : m_bGameLoop(true)
   m_ScenesController.CollectScenes();
   m_ScenesController.TransitionTo(GameSceneType::Menu);
 
-  const std::string& symbol = CAppSettings::instance().get_SlashSymbol();
-	std::string cursor_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "Other" + symbol + "cursor" + symbol + "cursor_default.png";
+	std::string cursor_texture_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/Other/cursor/cursor_default.png");
   m_CustomCursor.LoadCursor(cursor_texture_path);
 }
 
@@ -16,24 +15,42 @@ Game::~Game()
 
 }
 
-void Game::Play()
+void Game::Run()
 {
+  //The frames per second timer
+  Utils::SDL_Timer fps_timer;
+
+  //The frames per second cap timer
+  Utils::SDL_Timer cap_timer;
+
+  Utils::SDL_Timer step_timer;
+
+  int counted_frames = 0;
+  fps_timer.Start();
+
   while (m_bGameLoop)
   {
+    cap_timer.Start();
+    
     SDL_RenderClear(CSDLContext::instance().get_renderer());
-    m_frameStart = SDL_GetTicks();
-
+    
     InputHandler();
-    Update();
+    float dt = step_timer.GetTicks() / 1000.0f;
+    Update(dt * ((m_fps / 2) - 0.1f));
+    step_timer.Start();
+    
     Render();
 
     SDL_RenderPresent(CSDLContext::instance().get_renderer());
-    m_frameTime = m_frameStart - m_frameStart;
-    if (g_GameSceneType != GameSceneType::Menu)
-    {
-      if (m_frameDelay > m_frameTime)
+
+    ++counted_frames;
+
+    if(g_GameSceneType != GameSceneType::Menu){
+      int frame_ticks = cap_timer.GetTicks();
+      if(m_frameDelay > frame_ticks)
       {
-        SDL_Delay(m_frameDelay - m_frameTime);
+        //Wait remaining time
+        SDL_Delay(m_frameDelay - frame_ticks);
       }
     }
     
@@ -48,12 +65,17 @@ void Game::InputHandler()
   m_ScenesController.InputHandler();
 }
 
-void Game::Update()
+void Game::Update(float dt)
 {
-  m_ScenesController.Update();
+  m_ScenesController.Update(dt);
 }
 
 void Game::Render()
 {
   m_ScenesController.Render();
+}
+
+Uint32 Game::GetDeltaTime(Uint32 previous,float offset)
+{
+ return ((SDL_GetTicks() - previous) + offset); 
 }

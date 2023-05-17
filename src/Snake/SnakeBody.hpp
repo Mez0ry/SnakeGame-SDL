@@ -9,18 +9,19 @@
 class SnakeBody {
 private:
 	Texture m_SnakeBodyTexture;
-	SquareType** m_MapState;
 public:
 	SnakeBody();
 	~SnakeBody();
 	void AddLength();
-	void Update(SquareType** map_state, EntityPosition& snake_position);
+	void Update(Vec2& snake_position);
 	void Render();
 	void Reset();
+
+public:
+	Texture& GetTexture() {return m_SnakeBodyTexture;}
 private:
 	const size_t m_maxlength = 10;
 	size_t m_CurrSize;
-	std::deque<SDL_Rect> rq;
-	SDL_Rect m_BodyPosition;
+	std::deque<Vec2> m_BodyDq;
 };
 #endif // !SnakeGame_SNAKE_BODY_HPP

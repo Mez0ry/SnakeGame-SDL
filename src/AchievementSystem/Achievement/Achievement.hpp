@@ -13,25 +13,26 @@ private:
 public:
   Achievement() = default;
   ~Achievement() = default;
-
+  
   void LoadTexture(const std::string &texture_path, int texture_width,int texture_height) {
     m_Texture.LoadTexture(texture_path);
-    m_Texture.set_Rect<SourceRect>(0,0,texture_width,texture_height);
+    m_Texture.SetRect<SourceRect>({0,0},TextureSize(texture_width,texture_height));
   }
   
-  void set_dstRect(int x, int y, int w , int h){
-    m_Texture.set_Rect(x,y,w,h);
+  template<typename _Type = DestRect>
+  void SetRect(const Vec2& pos, const TextureSize& size){
+    m_Texture.SetRect<_Type>(pos,size);
   }
-  
+
   void SetAchievementAlphaMod(uint8_t alpha){
-    SDL_SetTextureAlphaMod(m_Texture.get_Texture(),alpha);
+    SDL_SetTextureAlphaMod(m_Texture.GetTexture(),alpha);
   }
 
   void AddAnimation(ScopePtr<AchievementAnimation> pAnim) {
     m_animation = std::move(pAnim);
   }
 
-  void Update() {m_animation->Update(m_Texture.get_Rect()); }
+  void Update() {m_animation->Update(m_Texture.GetRect()); }
 
   void Render() {m_Texture.RenderTexture(); }
 

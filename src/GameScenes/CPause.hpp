@@ -12,17 +12,17 @@ public:
   ~CPause();
 
   void OnCreate() override;
-  void BeforeDestruction() override;
   void OnDestroy() override;
 
   void InputHandler() override;
-  void Update() override;
+  void Update(float dt) override;
   void Render() override;
 
   GameSceneType get_SceneTypeToIgnore() override {
     return GameSceneType::Playing;
   }
-
+private:
+  void Resize();
 private:
   Texture m_BackgroundTexture;
   Text m_PauseText;

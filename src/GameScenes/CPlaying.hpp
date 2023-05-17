@@ -10,6 +10,8 @@
 #include "../Timestamp/Timestamp.hpp"
 #include <list>
 #include "../Serializer/Serializer.hpp"
+#include "../ObjectPool.hpp"
+#include "../TextureAnimation/TextureAnimation.hpp"
 
 class CPlaying : public GameScene
 {
@@ -22,17 +24,24 @@ public:
   void OnDestroy() override;
 
   void InputHandler() override;
-  void Update() override;
+  void Update(float dt) override;
   void Render() override;
   GameSceneType get_SceneTypeToIgnore() override { return  GameSceneType::Pause;}
 private:
   void TakeAndSaveScreenShot();
-
+  void Resize();
+  
 private:
+  std::vector<std::reference_wrapper<Entity>> m_EntityList;
+  
   Map m_Map;
   Snake m_Snake;
-  Food m_food[FOOD_SIZE];
-  std::shared_ptr<FoodFlyweight> m_pFoodFlyweight;
+  std::vector<Food> m_FoodVec;
+
+  ObjectPool<TextureAnimation> m_ExplosionPool;
+  std::vector<ResourceInfo<TextureAnimation*>> m_ExplosionsInUse;
+
+  //std::shared_ptr<FoodFlyweight> m_pFoodFlyweight;
   GameScore m_GameScore;
   CollideSystem m_CollideSystem;
   AchievementSystem m_AchievementSystem;

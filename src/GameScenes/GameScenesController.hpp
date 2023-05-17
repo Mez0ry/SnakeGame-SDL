@@ -23,7 +23,7 @@ public:
   */
   void CollectScenes();
   void InputHandler();
-  void Update();
+  void Update(float dt);
   void Render();
   /**
    * @return id of added scene

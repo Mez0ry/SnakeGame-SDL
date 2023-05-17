@@ -2,16 +2,29 @@
 
 GameScore::GameScore() : m_Score(99)
 {
-  const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
+  std::string score_bar_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/GameScenes/Shared/ScoreBar.png");
+  m_ScoreBarTexture.LoadTexture(score_bar_path);
 
-  std::string font_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "fonts" + symbol + "HACKED.ttf";
+  int win_w{CAppSettings::instance().get_WindowWidth()},win_h{CAppSettings::instance().get_WindowHeight()};
 
-  m_FontManager.LoadFont(font_path.c_str(), 20);
+  TextureSize texture_size(win_w * 0.2,win_h * 0.03f);
 
-  m_FontManager.set_Rect(50, CAppSettings::instance().get_WindowHeight() - 50, 100, 40);
+  Vec2 score_bar_pos;
+  score_bar_pos.x = win_w / 2 - (texture_size.GetWidth() / 2);
+  score_bar_pos.y = (texture_size.GetHeight() / 2);
 
-  std::string map_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "map" + symbol + "map_texture.png";
-  m_BackTexture.LoadTexture(map_texture_path);
+  m_ScoreBarTexture.SetRect(score_bar_pos,texture_size);
+
+  m_ScoreBarTexture.SetRect<SourceRect>({0,0},TextureSize(341,47));
+
+  std::string font_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/fonts/HACKED.ttf");
+
+  m_ScoreText.LoadFont(font_path.c_str(), 20);
+
+  TextureSize score_size(win_w * 0.1f, win_h * 0.02f);
+  
+  m_ScoreText->SetRect({score_bar_pos.x + score_size.GetWidth() / 2,score_bar_pos.y + score_size.GetHeight() / 2},score_size);
+  m_ScoreText->SetRect<SourceRect>({0,0}, TextureSize(100, 40));
 }
 
 GameScore::~GameScore()
@@ -24,8 +37,7 @@ void GameScore::OnDestroy()
 {
   m_GamesScore.push_front(m_Score);
 
-  const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
-  std::string file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "CMatchHistory-Data.cfg";
+  std::string file_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/GameScenes/CMatchHistory/CMatchHistory-Data.cfg");
   
   Serializer ser;
   auto& node = ser["CMatchHistory-Data"];
@@ -38,6 +50,27 @@ void GameScore::OnDestroy()
   }
   
   Serializer::Serialize(ser,file_path);
+}
+
+void GameScore::OnResize()
+{
+  int win_w{},win_h{};
+  SDL_GetWindowSize(CSDLContext::instance().get_window(),&win_w,&win_h);
+
+  TextureSize texture_size(win_w * 0.2,win_h * 0.03f);
+
+  Vec2 score_bar_pos;
+  score_bar_pos.x = win_w / 2 - (texture_size.GetWidth() / 2);
+  score_bar_pos.y = (texture_size.GetHeight() / 2);
+
+  m_ScoreBarTexture.SetRect(score_bar_pos,texture_size);
+
+  m_ScoreBarTexture.SetRect<SourceRect>({0,0},TextureSize(341,47));
+
+  TextureSize score_size(win_w * 0.1f, win_h * 0.02f);
+  
+  m_ScoreText->SetRect({score_bar_pos.x + score_size.GetWidth() / 2,score_bar_pos.y + score_size.GetHeight() / 2},score_size);
+  m_ScoreText->SetRect<SourceRect>({0,0}, TextureSize(100, 40));
 }
 
 void GameScore::Update()
@@ -62,12 +95,12 @@ void GameScore::Update()
 
 void GameScore::Render()
 {
+  m_ScoreBarTexture.RenderTexture();
   std::string text = "Score: " + std::to_string(m_Score);
-  m_FontManager.LoadText(text.c_str(), m_ScoreColor);
-
-  m_FontManager.RenderTextOnTopOfAnother(m_BackTexture.get_Texture(), m_BackTexture.get_Rect<SourceRect>(), m_BackTexture.get_Rect());
-
-  m_FontManager.DestroyText();
+  m_ScoreText.LoadText(text.c_str(), m_ScoreColor);
+  
+  m_ScoreText.RenderText();
+  m_ScoreText.Reset();
 }
 
 void GameScore::Subtract(int num) { m_Score -= num; }
@@ -80,20 +113,9 @@ void GameScore::onNotify(const Entity &entity, ObserverEvents event)
   {
   case ENTITY_IS_COLLIDING_WITH_FOOD:
   {
-    if (const Food *ptrFood = dynamic_cast<const Food *>(&entity);
-        ptrFood != nullptr)
+    if (const Food *ptrFood = dynamic_cast<const Food *>(&entity);ptrFood != nullptr)
     {
-      if (ptrFood->get_FoodType() == FoodType::Edible)
-      {
-        m_Score += ptrFood->get_PointsForFood();
-      }
-      else
-      {
-        if (ptrFood->get_FoodType() == FoodType::InEdible)
-        {
-          m_Score -= ptrFood->get_PointsForFood();
-        }
-      }
+      m_Score += ptrFood->GetPoints();
       const_cast<Food *>(ptrFood)->RespawnNewFood();
     }
     break;

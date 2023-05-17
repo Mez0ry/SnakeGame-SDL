@@ -28,20 +28,19 @@ private:
 class Game {
 private:
   uint32_t m_fps = 60;
-  uint32_t m_frameDelay = 3000 / m_fps;
-  uint32_t m_frameStart;
-  uint32_t m_frameTime;
+  float m_frameDelay = 3000 / m_fps;
   bool m_bGameLoop = false;
 
 public:
   Game();
   ~Game();
-  void Play();
+  void Run();
 
   void InputHandler();
-  void Update();
+  void Update(float dt);
   void Render();
-
+private:
+  Uint32 GetDeltaTime(Uint32 previous,float offset);
 private:
   GameScenesController m_ScenesController;
   CustomCursor m_CustomCursor;

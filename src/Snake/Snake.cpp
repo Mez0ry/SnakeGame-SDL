@@ -1,27 +1,33 @@
 #include "Snake.hpp"
 
-Snake::Snake() : m_MapState(nullptr)
+Snake::Snake() : m_DirectionVec(0,0) , m_ScalarVelocity(1)
 {
-  m_Model.m_TextureDrawIndex = 0;
+  std::string texture_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/snake/head_left.png");
 
-  const std::string& symbol = CAppSettings::instance().get_SlashSymbol();
-  std::string texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "snake" + symbol + "head_left.png";
-
-  m_Model.m_SnakeTextures[0].LoadTexture(texture_path);
-  texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "snake" + symbol + "head_right.png";
-  m_Model.m_SnakeTextures[1].LoadTexture(texture_path);
-  texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "snake" + symbol + "head_up.png";
-  m_Model.m_SnakeTextures[2].LoadTexture(texture_path);
-  texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "snake" + symbol + "head_down.png";
-  m_Model.m_SnakeTextures[3].LoadTexture(texture_path);
+  m_SnakeTextures[0].LoadTexture(texture_path);
+  texture_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/snake/head_right.png");
+  m_SnakeTextures[1].LoadTexture(texture_path);
+  texture_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/snake/head_up.png");
+  m_SnakeTextures[2].LoadTexture(texture_path);
+  texture_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/snake/head_down.png");
+  m_SnakeTextures[3].LoadTexture(texture_path);
 
   const int snake_texture_size = 4;
+  
   for (int i = 0; i < snake_texture_size; i++)
   {
-    m_Model.m_SnakeTextures[i].set_Rect(0, 0, 32, 32);
-    m_Model.m_SnakeTextures[i].set_Rect<SourceRect>(0, 0, 32, 32);
+    m_SnakeTextures[i].SetTexturePosition({0,0});
+    m_SnakeTextures[i].SetTexturePosition<SourceRect>({0,0});
+
+    m_SnakeTextures[i].SetTextureSize({32,32});
+    m_SnakeTextures[i].SetTextureSize<SourceRect>(TextureSize(40, 40));
   }
+  m_Texture.SetTexturePosition({0,0});
+  m_Texture.SetTexturePosition<SourceRect>({0,0});
   
+  m_Texture.SetTextureSize({32,32});
+  m_Texture.SetTextureSize<SourceRect>(TextureSize(40, 40));
+
 }
 
 Snake::~Snake() {
@@ -30,11 +36,11 @@ Snake::~Snake() {
 
 void Snake::OnCreate()
 {
-  m_Model.m_SnakePosition.x = CAppSettings::instance().get_MapWidth() / 2;
-  m_Model.m_SnakePosition.y = CAppSettings::instance().get_MapHeight() / 2;
-  m_Model.m_SnakeTextures[m_Model.m_TextureDrawIndex].set_Rect(m_Model.m_SnakePosition.x * m_Model.m_SnakeTextures[0].get_Rect<SourceRect>().w + CAppSettings::instance().get_WindowWidth() / CAppSettings::instance().get_MapWidth(),m_Model.m_SnakePosition.y * m_Model.m_SnakeTextures[0].get_Rect<SourceRect>().h + CAppSettings::instance().get_WindowWidth() / CAppSettings::instance().get_MapWidth(), 32, 32);
+  m_SnakePosition.x = CAppSettings::instance().get_MapWidth() / 2;
+  m_SnakePosition.y = CAppSettings::instance().get_MapHeight() / 2;
+
   m_SnakeBody.Reset();
-  m_MoveDir = MoveDir::UNKNOWN;
+  m_DirectionVec = {0,0};
 }
 
 void Snake::OnDestroy()
@@ -44,19 +50,33 @@ void Snake::OnDestroy()
 
 void Snake::InputHandler()
 {
-  m_MoveToCommand.SetDir(m_MoveDir);
-  m_MoveToCommand.Execute(m_Model);
+    m_PrevSnakePosition = m_SnakePosition;
+
+    if(m_DirectionVec.x == -1 && m_DirectionVec.y == 0 || m_DirectionVec.x == 0 && m_DirectionVec.y == 0){
+      m_Texture.ShareSDLTexture(m_SnakeTextures[0]);
+    }else if (m_DirectionVec.x == 1 && m_DirectionVec.y == 0){
+      m_Texture.ShareSDLTexture(m_SnakeTextures[1]);
+    }else if(m_DirectionVec.x == 0 && m_DirectionVec.y == -1){
+      m_Texture.ShareSDLTexture(m_SnakeTextures[2]);
+    }else if(m_DirectionVec.x == 0 && m_DirectionVec.y == 1){
+      m_Texture.ShareSDLTexture(m_SnakeTextures[3]);
+    }
+    
 }
 
-void Snake::Update()
+void Snake::Update(float dt)
 {
-  m_SnakeBody.Update(m_MapState, m_Model.m_SnakePosition);
-}
+  m_SnakePosition += ((m_DirectionVec * m_ScalarVelocity ) * dt); // TODO: Add (dt * ARBITARY TUNING)
 
-void Snake::Render()
-{
-  if(m_Model.m_TextureDrawIndex >= 0 && m_Model.m_TextureDrawIndex < 4){
-    m_Model.m_SnakeTextures[m_Model.m_TextureDrawIndex].RenderTexture();
+  if (!Map::IsOnBoard(m_SnakePosition)) {
+    g_GameSceneType = GameSceneType::Menu;
+    return;
   }
+
+  m_SnakeBody.Update(m_SnakePosition);
+}
+
+void Snake::OnRender()
+{
   m_SnakeBody.Render();
 }

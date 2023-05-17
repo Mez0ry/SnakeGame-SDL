@@ -12,13 +12,13 @@
 #include "../Serializer/Serializer.hpp"
 
 class GameScore : public Observer, public Subject{
-private:
-  Texture m_BackTexture;
 public:
   GameScore();
   ~GameScore();
   void OnCreate();
   void OnDestroy();
+  void OnResize();
+
   void onNotify(const Entity& entity, ObserverEvents event) override;
 
   void Update();
@@ -47,7 +47,9 @@ public:
 private:
   /** @brief contains score for every game client played*/
   std::list<int> m_GamesScore;
-  Text m_FontManager;
+  Text m_ScoreText;
+  Texture m_ScoreBarTexture;
+  
   SDL_Color m_ScoreColor = {255, 255, 255, 255};
   int m_Score;
 };

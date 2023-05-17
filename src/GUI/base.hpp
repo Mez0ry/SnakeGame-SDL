@@ -3,7 +3,7 @@
 #include <string>
 #include <memory>
 
-namespace UI{
+namespace GUI{
 
 template<typename T>
 	using Scope = std::unique_ptr<T>;

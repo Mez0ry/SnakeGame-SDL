@@ -12,7 +12,7 @@ int main(int agrc, char **argv) {
   CAppSettings::instance().LoadSettings();
   
   Game gm;
-  gm.Play();
+  gm.Run();
 
   return 0;
 }

@@ -4,9 +4,12 @@ CMatchHistory::CMatchHistory() {
   m_DataFields.reserve(10);
   m_ScoreVec.reserve(10);
   m_InGameTimeVec.reserve(10);
+  
+  std::string data_field_texture = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/GameScenes/CMatchHistory/data_field.png");
 
-  const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
-  std::string data_file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "CMatchHistory-Data.cfg";
+  m_DataFieldTexture.LoadTexture(data_field_texture);
+  
+  std::string data_file_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/GameScenes/CMatchHistory/CMatchHistory-Data.cfg");
 
   auto clean_file = [&](const std::string &file_path) -> void {
     std::fstream fstr(file_path.c_str(),
@@ -18,52 +21,77 @@ CMatchHistory::CMatchHistory() {
 
   clean_file(data_file_path.c_str());
 
-  std::string texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "Other" + symbol + "buttons" + symbol + "return_button.png";
-
+  std::string texture_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/Other/buttons/return_button.png");
+  
   // Return button
   m_ReturnButton.LoadTexture(texture_path.c_str());
   
-  int width = CAppSettings::instance().get_WindowWidth() / 26;
-  int height = CAppSettings::instance().get_WindowHeight() / 26;
-
-  m_ReturnButton.set_Rect(width, height, 52, 52);
-  m_ReturnButton.set_Rect<SourceRect>(0, 0, 512, 512);
+  int pos_x = CAppSettings::instance().get_WindowWidth() / 26;
+  int pos_y = CAppSettings::instance().get_WindowHeight() / 26;
+  
+  m_ReturnButton.SetRect({pos_x, pos_y}, TextureSize(52, 52));
+  m_ReturnButton.SetRect<SourceRect>({0, 0}, TextureSize(512, 512));
 
   // background texture
-  texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" +  symbol + "background_match_history_800x800.png";
+  texture_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/GameScenes/CMatchHistory/background_match_history_800x800.png");
 
   m_BackgroundTexture.LoadTexture(texture_path.c_str());
 
-  m_BackgroundTexture.set_Rect<SourceRect>(0, 0, 800, 800);
-  m_BackgroundTexture.set_Rect(0, 0, CAppSettings::instance().get_WindowWidth(), CAppSettings::instance().get_WindowHeight());
+  m_BackgroundTexture.SetRect<SourceRect>({0, 0}, TextureSize(800, 800));
+  m_BackgroundTexture.SetRect({0, 0},TextureSize(CAppSettings::instance().get_WindowWidth(), CAppSettings::instance().get_WindowHeight()));
 
   // Match board texture
-  texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "match_board.png";
+  texture_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/GameScenes/CMatchHistory/match_board.png");
   m_MatchBoardTexture.LoadTexture(texture_path.c_str());
 
   int match_board_source_width = 583;
   int match_board_source_height = 333;
 
-  m_MatchBoardTexture.set_Rect<SourceRect>(0, 0, match_board_source_width, match_board_source_height);
+  m_MatchBoardTexture.SetRect<SourceRect>({0, 0}, TextureSize(match_board_source_width, match_board_source_height));
 
-  int match_board_posX = (CAppSettings::instance().get_WindowWidth() / 2) - (m_MatchBoardTexture.get_Rect<SourceRect>().w / 2);
-  int match_board_posY = (CAppSettings::instance().get_WindowHeight() / 2) - (m_MatchBoardTexture.get_Rect<SourceRect>().h / 2) + 40;
+  int match_board_posX = (CAppSettings::instance().get_WindowWidth() / 2) - (m_MatchBoardTexture.GetTextureSize<SourceRect>().GetWidth() / 2);
+  int match_board_posY = (CAppSettings::instance().get_WindowHeight() / 2) - (m_MatchBoardTexture.GetTextureSize<SourceRect>().GetHeight() / 2) + 40;
 
-  m_MatchBoardTexture.set_Rect(match_board_posX, match_board_posY, match_board_source_width, match_board_source_height);
+  m_MatchBoardTexture.SetRect({match_board_posX, match_board_posY}, TextureSize(match_board_source_width, match_board_source_height));
+  
+  //ProgressBar
+  texture_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/GUI/Recources/progress_bar/Background/bg_style1.png");
+  m_ProgressBar.LoadBgTexture(texture_path,{0,0,235,9});
+  texture_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/GUI/Recources/progress_bar/Foreground/fg_style1.png");
+  m_ProgressBar.LoadFgTexture(texture_path,{0,0,235,9});
+
+  TextureSize progress_bar_size(100,10);
+  m_ProgressBar.SetSize(progress_bar_size);
+
+  Vec2 progress_bar_pos;
+  progress_bar_pos.x = (match_board_posX + (match_board_source_width / 2)) - progress_bar_size.GetWidth() / 2;
+  progress_bar_pos.y = ((match_board_posY + match_board_source_height) + CAppSettings::instance().get_WindowHeight()) / 2;
+  m_ProgressBar.SetPosition(progress_bar_pos);
+  
+  //ProgressPercentText
+  std::string font_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/GUI/Recources/fonts/HACKED.ttf");
+  m_ProgressText.LoadFont(font_path.c_str(),15);
+  m_ProgressText->SetRect({(progress_bar_pos.x + progress_bar_size.GetWidth() - 35),progress_bar_pos.y + 15},TextureSize(15,10));
+  m_ProgressText.LoadText(std::to_string(m_ProgressBar.GetProgress()).c_str(),{115, 124, 161,255});
+  
+  font_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/GUI/Recources/fonts/Comic_CAT.otf");
+  m_PercentSymbolText.LoadFont(font_path.c_str(),15);
+  m_PercentSymbolText->SetRect({m_ProgressText->GetTexturePosition().x + (m_ProgressText->GetTextureSize().GetWidth() + 5),m_ProgressText->GetTexturePosition().y},TextureSize(12,10));
+  m_PercentSymbolText.LoadText("%",{115, 124, 161,255});
+  
 }
 
 CMatchHistory::~CMatchHistory() {}
 
 void CMatchHistory::OnCreate() {
-  const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
-  std::string file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "CMatchHistory-Data.cfg";
+  std::string file_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/GameScenes/CMatchHistory/CMatchHistory-Data.cfg");
 
   Serializer des;
   if (Serializer::Deserialize(des, file_path)) {
     auto &node = des["CMatchHistory-Data"];
     auto &time_property = node["Time"];
     auto &score_property = node["Score"];
-
+    
     const int new_added_elem_index = 0;
     if (time_property.get_DataSize() > m_InGameTimeVec.size() && score_property.get_DataSize() > m_ScoreVec.size()) {
       m_InGameTimeVec.push_back(time_property.GetAs<double>(new_added_elem_index));
@@ -71,19 +99,16 @@ void CMatchHistory::OnCreate() {
     }
   }
 
-  // Data fields
-  std::string texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "data_field.png";
+  //data fields
 
-  int data_field_posX = (CAppSettings::instance().get_WindowWidth() / 2) - (m_MatchBoardTexture.get_Rect<SourceRect>().w / 2) + 5;
-  int data_field_posY = (CAppSettings::instance().get_WindowHeight() / 2) - (m_MatchBoardTexture.get_Rect<SourceRect>().h / 2) + 100;
+  int data_field_posX = (CAppSettings::instance().get_WindowWidth() / 2) - (m_MatchBoardTexture.GetTextureSize().GetWidth() / 2) + 5;
+  int data_field_posY = (CAppSettings::instance().get_WindowHeight() / 2) - (m_MatchBoardTexture.GetTextureSize().GetHeight() / 2) + 100;
 
-  int data_field_source_width = 572;
-  int data_field_source_height = 30;
-
+  const TextureSize df_size(572,30);
+  
   int space_between_data_fields = 15;
 
-  if (m_DataFields.size() < m_ScoreVec.size() &&
-      m_DataFields.size() < m_InGameTimeVec.size()) {
+  if (m_DataFields.size() < m_ScoreVec.size() && m_DataFields.size() < m_InGameTimeVec.size()) {
     m_DataFields.resize(m_DataFields.size() + 1);
   }
 
@@ -97,37 +122,39 @@ void CMatchHistory::OnCreate() {
   };
 
   SDL_Color data_color = {100, 165, 204, 255};
+  
+  if (m_DataFields.back().DataIsEmpty() && !m_DataFields.empty()) {
+    auto& last_DataField = m_DataFields.back();
+    last_DataField.ShareSDLTexture(m_DataFieldTexture);
+    last_DataField.SetBgSize(df_size);
+    
+    last_DataField.SetSpaceBetweenText(115);
+    last_DataField.AddContent(DataModel(std::to_string(m_DataFields.size()), 20, data_color));
+    last_DataField.AddContent(DataModel(std::to_string(m_ScoreVec.back()), 20, data_color));
 
-  if (m_DataFields.back().DataIsEmpty()) {
-
-    m_DataFields.back().LoadBackgroundTexture(
-        texture_path, data_field_source_width, data_field_source_height);
-    m_DataFields.back().SetSpaceBetweenText(115);
-    m_DataFields.back().AddContent(DataModel(std::to_string(m_DataFields.size()), 20, data_color));
-    m_DataFields.back().AddContent(DataModel(std::to_string(m_ScoreVec[m_ScoreVec.size() - 1]), 20, data_color));
-
-    std::string str = std::to_string(m_InGameTimeVec[m_InGameTimeVec.size() - 1]);
+    std::string str = std::to_string(m_InGameTimeVec.back());
 
     // Deletes decimal part and leaves the fractional
     fnDelete_decimal_part(str);
     double seconds = std::stod(str) * 60;
-    int minutes = (int)m_InGameTimeVec[m_InGameTimeVec.size() - 1];
+    int minutes = (int)m_InGameTimeVec.back();
     std::string minutes_and_seconds = std::to_string(minutes) + " : " + std::to_string(seconds);
-    m_DataFields.back().AddContent(DataModel(minutes_and_seconds, 20, data_color, 50, 20));
+    last_DataField.AddContent(DataModel(minutes_and_seconds, 20, data_color, 50, 20));
   }
   
-  for (int i = 0; i < m_DataFields.size(); i++) {
+  for (int read_index = m_DataFields.size() - 1, offset = 0; read_index >= 0 && !m_DataFields.empty(); read_index--,offset++) {
     Vec2 datafield_rect_pos;
     datafield_rect_pos.x = data_field_posX;
-    datafield_rect_pos.y = data_field_posY + (i * (space_between_data_fields + data_field_source_height));
+    datafield_rect_pos.y = data_field_posY + (offset * (space_between_data_fields + df_size.GetHeight()));
 
-    Vec2 datafield_rect_size;
-    datafield_rect_size.x = data_field_source_width;
-    datafield_rect_size.y = data_field_source_height;
 
-    m_DataFields[m_DataFields.size() - i - 1].SetBackgroundPosition(datafield_rect_pos);
-    m_DataFields[m_DataFields.size() - i - 1].SetBackgroundSize(datafield_rect_size);
+    m_DataFields[read_index].SetBgPosition(datafield_rect_pos);
+    m_DataFields[read_index].SetBgPosition<SourceRect>({0,0});
+
+    m_DataFields[read_index].SetBgSize(df_size);
   }
+
+  m_ProgressBar.Increase(5);
 }
 
 void CMatchHistory::OnDestroy() {}
@@ -139,11 +166,11 @@ void CMatchHistory::InputHandler() {
     cursor_pos.y = m_event.motion.y;
     switch (m_event.type) {
     case SDL_QUIT: {
-
+      
       break;
     }
     case SDL_MOUSEBUTTONDOWN: {
-      if (m_event.button.button == SDL_BUTTON_LEFT && m_ReturnButton.CursorIsColliding(cursor_pos)) {
+      if (m_event.button.button == SDL_BUTTON_LEFT && m_ReturnButton.PointIsOnTexture(cursor_pos)) {
         g_GameSceneType = GameSceneType::Menu;
       }
 
@@ -169,11 +196,15 @@ void CMatchHistory::InputHandler() {
   } //! SDL_PollEvent
 }
 
-void CMatchHistory::Update() {
+void CMatchHistory::Update(float dt) {
   m_InertialScroll.Decelerate();
-
+  m_ProgressBar.Update();
   for (int i = 0; i < m_DataFields.size(); i++) {
-    m_DataFields[i].GetBackgroundRect().y += m_InertialScroll.get_Model().scroll_y;
+    Vec2 new_pos;
+    new_pos.x = m_DataFields[i].GetBgPosition().x;
+    new_pos.y = m_DataFields[i].GetBgPosition().y + m_InertialScroll.get_Model().scroll_y;
+
+    m_DataFields[i].SetBgPosition(new_pos); 
     m_DataFields[i].Update();
   }
 }
@@ -183,12 +214,21 @@ void CMatchHistory::Render() {
   m_ReturnButton.RenderTexture();
   m_MatchBoardTexture.RenderTexture();
 
-  SDL_Rect clip_rect = {m_MatchBoardTexture.get_Rect().x, m_MatchBoardTexture.get_Rect().y + 40, m_MatchBoardTexture.get_Rect().w, (m_MatchBoardTexture.get_Rect().y + m_MatchBoardTexture.get_Rect().h) - 10};
+  m_ProgressBar.Render();
+
+  m_PercentSymbolText.RenderText();
+  if(m_ProgressBar.isChanged()){
+    m_ProgressText.Reset();
+    m_ProgressText.LoadText(std::to_string(m_ProgressBar.GetProgress()).c_str(),{115, 124, 161,255});
+  }
+  m_ProgressText.RenderText();
+  
+  SDL_Rect clip_rect = {m_MatchBoardTexture.GetTexturePosition().x, m_MatchBoardTexture.GetTexturePosition().y + 40, m_MatchBoardTexture.GetTextureSize().GetWidth(), (m_MatchBoardTexture.GetTexturePosition().y + m_MatchBoardTexture.GetTextureSize().GetHeight()) - 10};
 
   SDL_RenderSetClipRect(CSDLContext::instance().get_renderer(), &clip_rect);
 
   for (int i = 0; i < m_DataFields.size(); i++) {
-    if ((m_DataFields[i].GetBackgroundRect().y + 36) < (m_MatchBoardTexture.get_Rect().y + m_MatchBoardTexture.get_Rect<SourceRect>().h) - 5) {
+    if ((m_DataFields[i].GetBgPosition().y + 36) < (m_MatchBoardTexture.GetTexturePosition().y + m_MatchBoardTexture.GetTextureSize<SourceRect>().GetHeight()) - 5) {
       m_DataFields[i].Render();
     }
   }

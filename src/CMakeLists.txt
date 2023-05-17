@@ -4,7 +4,7 @@ add_subdirectory(CAppSettings)
 add_subdirectory(CSDLContext)
 add_subdirectory(Timestamp)
 add_subdirectory(Texture)
-add_subdirectory(SpriteAnimation)
+add_subdirectory(TextureAnimation)
 add_subdirectory(Sound)
 add_subdirectory(Food)
 add_subdirectory(Snake)
@@ -25,10 +25,10 @@ target_link_libraries(${EXECUTABLE_NAME} CAppSettings
                           CSDLContext 
                           Timestamp 
                           Texture 
-                          SpriteAnimation 
+                          TextureAnimation 
                           Sound 
                           Food 
-                          Snake 
+                          Snake
                           Observer 
                           Logger 
                           GameScenes 

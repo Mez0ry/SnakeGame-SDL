@@ -55,11 +55,11 @@ void GameScenesController::InputHandler()
   }
 }
 
-void GameScenesController::Update()
+void GameScenesController::Update(float dt)
 {
   if (m_pCurrentScene != nullptr)
   {
-    m_pCurrentScene->Update();
+    m_pCurrentScene->Update(dt);
   }
 }
 void GameScenesController::Render()

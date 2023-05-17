@@ -1,1 +1,0 @@
-add_library(SpriteAnimation SHARED SpriteAnimation.hpp SpriteAnimation.cpp)

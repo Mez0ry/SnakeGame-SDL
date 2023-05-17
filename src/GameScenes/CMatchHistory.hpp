@@ -7,6 +7,7 @@
 #include <climits>
 #include "../GUI/Text/Text.hpp"
 #include "../GUI/UIElements/Datafield.hpp"
+#include "../GUI/UIElements/ProgressBar.hpp"
 #include "../GUI/InertialScroll/InertialScroll.hpp"
 #include "../Serializer/Serializer.hpp"
 #include "../Vector.hpp"
@@ -19,18 +20,23 @@ public:
     ~CMatchHistory();
 
     void OnCreate() override;
-    void BeforeDestruction() override {}
     void OnDestroy() override;
     
     void InputHandler() override;
-    void Update() override;
+    void Update(float dt) override;
     void Render() override;
 
 private:
     Texture m_ReturnButton;
     Texture m_BackgroundTexture;
     Texture m_MatchBoardTexture;
-
+    Texture m_DataFieldTexture;
+    
+    ProgressBar m_ProgressBar;
+    Text m_ProgressText; // In percents
+    Text m_PercentSymbolText;
+    int m_CurrentExperience;
+    int m_TotalExperience;
     InertialScroll m_InertialScroll;
     
     std::vector<Datafield> m_DataFields;
