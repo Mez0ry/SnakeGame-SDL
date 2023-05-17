@@ -3,7 +3,7 @@
 #include "../../Texture/Texture.hpp"
 #include "../../Vector.hpp"
 #include "../Text/Text.hpp"
-#include "../base.hpp"
+
 #include <stdexcept>
 #include <string>
 #include <vector>
