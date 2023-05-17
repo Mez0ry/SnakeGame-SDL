@@ -3,10 +3,9 @@ set(EXECUTABLE_NAME SnakeGameSDL)
 add_subdirectory(CAppSettings)
 add_subdirectory(CSDLContext)
 add_subdirectory(Timestamp)
-add_subdirectory(TextureManager)
-add_subdirectory(SpriteAnimation)
-add_subdirectory(SoundManager)
-add_subdirectory(FontManager)
+add_subdirectory(Texture)
+add_subdirectory(TextureAnimation)
+add_subdirectory(Sound)
 add_subdirectory(Food)
 add_subdirectory(Snake)
 add_subdirectory(Observer)
@@ -15,27 +14,28 @@ add_subdirectory(GameScenes)
 add_subdirectory(AchievementSystem)
 add_subdirectory(CollideSystem)
 add_subdirectory(GameScore)
+add_subdirectory(GUI)
 
 include_directories({PROJECT_SOURCE_DIR}/Serializer)
 include_directories({PROJECT_SOURCE_DIR}/Entity)
 
-add_executable(${EXECUTABLE_NAME} main.cpp Game.hpp Game.cpp Map.hpp Map.cpp)
+add_executable(${EXECUTABLE_NAME} main.cpp Game.hpp Game.cpp Map.hpp Map.cpp Vector.hpp)
 
 target_link_libraries(${EXECUTABLE_NAME} CAppSettings
                           CSDLContext 
                           Timestamp 
-                          TextureManager 
-                          SpriteAnimation 
-                          SoundManager 
-                          FontManager 
+                          Texture 
+                          TextureAnimation 
+                          Sound 
                           Food 
-                          Snake 
+                          Snake
                           Observer 
                           Logger 
                           GameScenes 
                           AchievementSystem 
                           CollideSystem 
-                          GameScore)
+                          GameScore
+                          GUI)
 
 ##Vendor
 set(SDL_STATIC ON CACHE BOOL "" FORCE)

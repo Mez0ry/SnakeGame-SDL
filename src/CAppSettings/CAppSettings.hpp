@@ -46,7 +46,6 @@ public:
    */
   void LoadSettings();
 
-  const std::string &get_SlashSymbol() const { return this->m_SlashSymbol; }
   const std::string &get_SourceFolder() const { return m_SrcFolderPath; }
 
   void set_SourceFolder(char *source_folder);
@@ -57,6 +56,21 @@ public:
   int get_MapWidth() const;
   bool get_FullScreen() const;
 
+  [[nodiscard]] static std::string GetCorrectedPath(const std::string& path){
+    std::string res;
+    res.reserve(100);
+    for(int i = 0;i<path.size();i++){
+      if(path[i] == '/' || path[i] == '\\'){
+        res.append(instance().get_SlashSymbol());
+      }else{
+        res.append(1,path.at(i));
+      }
+       
+    }
+    return res;
+  }
+
 private:
+  const std::string &get_SlashSymbol() const { return this->m_SlashSymbol; }
 };
 #endif //! SnakeGame_CAppSettings_HPP

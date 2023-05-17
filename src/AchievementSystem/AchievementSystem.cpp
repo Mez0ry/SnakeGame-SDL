@@ -1,17 +1,7 @@
 #include "AchievementSystem.hpp"
 
 AchievementSystem::AchievementSystem() {
-  const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
-  std::string achievement_dir_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "Achievements";
-
-  auto get_image_type = [](const std::string &file_extension) -> ImageType {
-    if (file_extension == ".png") {
-      return ImageType::PNG;
-    } else if (file_extension == ".bmp") {
-      return ImageType::BMP;
-    }
-    return static_cast<ImageType>(-1);
-  };
+  std::string achievement_dir_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/Achievements");
 
   int achievement_posX = CAppSettings::instance().get_WindowWidth() / 4;
   int achievement_posY = CAppSettings::instance().get_WindowHeight();
@@ -27,15 +17,15 @@ AchievementSystem::AchievementSystem() {
     file_name      = file_name.substr(0, file_name.find_last_of("."));
 
     m_AchievesMap.insert(std::make_pair(file_name, std::make_shared<Achievement>()));
-    m_AchievesMap.at(file_name)->LoadTexture( path.string(), get_image_type(file_extension), 527, 125);
+    m_AchievesMap.at(file_name)->LoadTexture( path.string(), 527, 125);
     m_AchievesMap.at(file_name)->AddAnimation( std::make_unique<DefaultAnimation>());
-
+  
     m_AchievesMap.at(file_name)->SetAchievementAlphaMod(230);
 
-    m_AchievesMap.at(file_name)->set_dstRect(achievement_posX, achievement_posY,  527, 125);
+    m_AchievesMap.at(file_name)->SetRect({achievement_posX, achievement_posY}, TextureSize(527, 125));
   }
-
-  std::string achievement_config_path = CAppSettings::instance().get_SourceFolder() + symbol + "AchievementSystem" + symbol + "Achievement" + symbol + "config" + symbol + "achieve_config.cfg";
+  
+  std::string achievement_config_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/AchievementSystem/Achievement/config/achieve_config.cfg");
 
   Serializer des;
   if(Serializer::Deserialize(des,achievement_config_path)){
@@ -43,21 +33,20 @@ AchievementSystem::AchievementSystem() {
 
       auto& node = des[key.first];
       auto& unlocked_property = node["Unlocked"];
-      key.second->set_isUnlocked(unlocked_property.get_Bool(0));
+      key.second->set_isUnlocked(unlocked_property.GetAs<bool>(0));
     }
   }
   
 }
 
 AchievementSystem::~AchievementSystem() {
-   const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
-   std::string achievement_config_path = CAppSettings::instance().get_SourceFolder() + symbol + "AchievementSystem" + symbol + "Achievement" + symbol + "config" + symbol + "achieve_config.cfg";
+   std::string achievement_config_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/AchievementSystem/Achievement/config/achieve_config.cfg");
 
     Serializer ser;
     for (auto &key : m_AchievesMap) {
       auto &node = ser[key.first];
       auto &unlocked_property = node["Unlocked"];
-      unlocked_property.set_Bool(key.second->isUnlocked());
+      unlocked_property.SetAs<bool>(key.second->isUnlocked());
     }
 
     Serializer::Serialize(ser, achievement_config_path);

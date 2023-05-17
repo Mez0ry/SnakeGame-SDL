@@ -2,28 +2,29 @@
 #define SnakeGame_GameScenes_CPAUSE_HPP
 #include "../CAppSettings/CAppSettings.hpp"
 #include "../CSDLContext/CSDLContext.hpp"
-#include "../TextureManager/TextureManager.hpp"
-#include "../FontManager/FontManager.hpp"
+#include "../Texture/Texture.hpp"
+#include "../GUI/Text/Text.hpp"
 #include "GameScene.hpp"
+
 class CPause : public GameScene {
 public:
   CPause();
   ~CPause();
 
   void OnCreate() override;
-  void BeforeDestruction() override;
   void OnDestroy() override;
 
   void InputHandler() override;
-  void Update() override;
+  void Update(float dt) override;
   void Render() override;
 
   GameSceneType get_SceneTypeToIgnore() override {
     return GameSceneType::Playing;
   }
-
 private:
-  TextureManager m_BackgroundTexture;
-  FontManager m_PauseText;
+  void Resize();
+private:
+  Texture m_BackgroundTexture;
+  Text m_PauseText;
 };
 #endif //! SnakeGame_GameScenes_CPAUSE_HPP

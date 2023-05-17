@@ -3,18 +3,13 @@
 #include "../../CSDLContext/CSDLContext.hpp"
 
 #include "../../Vector.hpp"
-#include "../base.hpp"
+#include "../../Base.hpp"
+
 #include "SDL2/SDL_ttf.h"
 #include <bitset>
 #include <iostream>
 #include <string_view>
-
-struct SDL_TextureDeleter {
-  void operator()(SDL_Texture *texture) {
-    SDL_DestroyTexture(texture);
-    texture = nullptr;
-  }
-};
+#include "../../Texture/Texture.hpp"
 
 struct TTF_FontDeleter {
   void operator()(TTF_Font *font) {
@@ -32,55 +27,51 @@ public:
   ~Text() noexcept;
 
   Text(Text &&other) {
-    this->m_font = other.m_font;
-    this->m_Texture = other.m_Texture;
-    this->m_dst = std::move(other.m_dst);
+    this->m_font = std::move(other.m_font);
+    this->m_Texture = std::move(other.m_Texture);
     this->m_Color = std::move(other.m_Color);
-    this->m_Selected = std::move(other.m_Selected);
   }
 
   Text& operator=(const Text& other){
+    if(this == &other){
+      return (*this);
+    }
     this->m_font = other.m_font;
     this->m_Texture = other.m_Texture;
-    this->m_dst = other.m_dst;
+
     this->m_Color = other.m_Color;
-    this->m_Selected = other.m_Selected;
     return (*this);
   }
 
   Text& operator=(Text&& other){
-    this->m_font = other.m_font;
-    this->m_Texture = other.m_Texture;
-    this->m_dst = std::move(other.m_dst);
+    if(this == &other){
+      return (*this);
+    }
+    this->m_font = std::move(other.m_font);
+    this->m_Texture = std::move(other.m_Texture);
     this->m_Color = std::move(other.m_Color);
-    this->m_Selected = std::move(other.m_Selected);
     return (*this);
   }
   
-  void LoadFont(const char *path, int font_size);
+  Texture* operator->(){
+    return &m_Texture;
+  }
 
-  const SDL_Rect &get_Rect() const { return m_dst; }
-  void set_Rect(const SDL_Rect &rect) { m_dst = std::move(rect); }
-  void set_Rect(int x, int y, int width, int height);
+  Base::Ref<TTF_Font> LoadFont(const char *path, int font_size);
+  Texture& LoadText(const char *text, const SDL_Color &color);
 
-  void DestroyText();
-  void LoadText(const char *text, const SDL_Color &color);
-
-  [[nodiscard]] SDL_Texture *get_Texture() const { return m_Texture.get(); }
+  void ShareFont(Base::Ref<TTF_Font>&& font);
+  void Reset();
+  void ResetFont();
 
   void RenderText();
 
-  void RenderTextOnTopOfAnother(SDL_Texture *back_texture, SDL_Rect &back_src, SDL_Rect &back_dst);
-
-  bool CursorIsColliding(const Vec2 &cursor_pos);
-  bool isSelected() const { return m_Selected[0]; }
-  void set_SelectStatus(bool state) { this->m_Selected[0] = state; }
+  Texture& GetTextTexture() {return m_Texture;}
+  const Texture& GetTextTexture() const {return m_Texture;}
 
 private:
-  UI::Ref<TTF_Font> m_font;
-  UI::Ref<SDL_Texture> m_Texture;
-  SDL_Rect m_dst;
+  Base::Ref<TTF_Font> m_font;
+  Texture m_Texture;
   SDL_Color m_Color;
-  std::bitset<1> m_Selected;
 };
 #endif //! SnakeGame_FONT_MANAGER_HPP

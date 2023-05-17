@@ -1,0 +1,1 @@
+add_library(TextureAnimation SHARED TextureAnimation.hpp TextureAnimation.cpp)

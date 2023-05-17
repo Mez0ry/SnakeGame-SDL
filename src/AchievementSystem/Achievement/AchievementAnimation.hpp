@@ -5,6 +5,7 @@
 #include <chrono>
 #include <functional>
 #include <queue>
+#include <memory>
 #include "../../Timestamp/Timestamp.hpp"
 
 class Task{
@@ -70,7 +71,7 @@ public:
   AchievementAnimation() {}
   virtual ~AchievementAnimation() {}
 
-  virtual void Update(SDL_Rect &rect) = 0;
+  virtual void Update(SDL_Rect& texture) = 0;
   virtual bool isUnlocked() const = 0;
   virtual void set_isUnlocked(bool is_unlocked) = 0;
 
@@ -80,6 +81,7 @@ private:
 class DefaultAnimation : public AchievementAnimation {
 public:
   DefaultAnimation() : m_IsUnlocked(false) {
+    
     // show achievement
     auto show_achievement = [&](SDL_Rect &rect) -> bool {
       if (rect.y > CAppSettings::instance().get_WindowHeight() - 150) {
@@ -89,6 +91,7 @@ public:
       }
       return false;
     };
+
     m_TaskQueue.push(std::make_shared<AchievementTask>(AchievementTask(show_achievement)));
 
     m_TaskQueue.push(std::make_shared<DelayedTask>(DelayedTask(100)));
@@ -108,7 +111,7 @@ public:
 
   ~DefaultAnimation() {}
 
-  void Update(SDL_Rect &rect) override {
+  void Update(SDL_Rect& rect) override {
     if (m_TaskQueue.empty() || m_IsUnlocked)
       return;
 

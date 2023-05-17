@@ -1,0 +1,1 @@
+add_library(Sound SHARED SoundManager.hpp Sound.hpp Sound.cpp)

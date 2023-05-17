@@ -1,5 +1,5 @@
 #include "Food.hpp"
-Food::Food() {
+Food::Food() : m_TextureSize(32,32) {
  
 }
 
@@ -7,59 +7,27 @@ Food::~Food() {
 
 }
 
-void Food::LoadTexture(const char *path) {
-  std::string texture_path = path;
-  m_pFoodModel->Texture.LoadTexture(texture_path);
-}
-
-void Food::set_DstRect(int x, int y, int w, int h) {
-  m_pFoodModel->Texture.set_dstRect(x, y, w, h);
-}
-
-void Food::set_SrcRect(int x, int y, int w, int h) {
-  m_pFoodModel->Texture.set_srcRect(x, y, w, h);
-}
-
-void Food::Update() {
-  if(m_pFoodModel->Type == FoodType::InEdible){
-    std::chrono::seconds time(RESPAWN_INEDIBLE_FOOD_IN);
-    if(m_TimeStamp.GetDurationInSeconds() >= time.count()){
-    RespawnNewFood();
-    }
-  }
-}
-
-void Food::Render() {
-  if (m_Position.x < 0 || m_Position.y < 0 || m_Position.x >= CAppSettings::instance().get_MapWidth() || m_Position.y >= CAppSettings::instance().get_MapHeight())
-    return;
-
-  m_MapState[m_Position.y][m_Position.x] = SquareType::ENTITY;
+void Food::Update(float dt) {
   
-  m_pFoodModel->Texture.set_dstRect(MapUtils::CorrectWidthPosOnTheMap(m_Position.x),MapUtils::CorrectHeightPosOnTheMap(m_Position.y), TextureConstants::TextureWidth, TextureConstants::TextureHeight);
-
-  m_pFoodModel->Texture.RenderTexture();
+  // switch(m_pFoodModel->StrategyType->execute(m_TimeStamp.GetDurationInSeconds())){
+  //   case FoodEvent::RESPAWN_FOOD:{
+  //     RespawnNewFood();
+  //     break;
+  //   }
+  // }
+  
 }
 
-void Food::set_MapState(SquareType **map_state) {
-  this->m_MapState = map_state;
-}
-
-void Food::set_FoodFlyweight(const std::shared_ptr<FoodFlyweight>& pFoodFlyweight){
-  this->m_pFoodFlyweight = pFoodFlyweight;
+void Food::OnRender() {
+  
 }
 
 void Food::RespawnNewFood() {
-  this->randomizePositionOnMap();
+  this->RandomizePosition();
   this->randomizeFoodTexture();
 }
 
-void Food::randomizePositionOnMap() {
-  if (m_Position.x > 0 && m_Position.y > 0 &&
-      m_Position.x < CAppSettings::instance().get_MapWidth() &&
-      m_Position.y < CAppSettings::instance().get_MapHeight()) {
-    m_MapState[m_Position.y][m_Position.x] = SquareType::BACKGROUND;
-  }
-
+void Food::RandomizePosition() {
   std::random_device dev;
   std::mt19937 rng(dev());
   std::uniform_int_distribution<std::mt19937::result_type> PositionX(0, CAppSettings::instance().get_MapWidth() - 1);
@@ -71,18 +39,19 @@ void Food::randomizePositionOnMap() {
 }
 
 inline void Food::randomizeFoodTexture() {
-
-  std::random_device dev;
-  std::mt19937 rng(dev());
-  std::uniform_int_distribution<std::mt19937::result_type> food_type(0, 5);
-
-  std::string symbol = CAppSettings::instance().get_SlashSymbol();
-  std::string food_texture_path;
-
-  m_pFoodModel = m_pFoodFlyweight->get_FoodModel(static_cast<FoodName>(food_type(rng)));
+  auto path = CAppSettings::instance().get_SourceFolder() + CAppSettings::instance().GetCorrectedPath("/assets/food/configs/food.cfg");
+  
+  Serializer des;
+  if(Serializer::Deserialize(des,path)){
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> rand_food(0, des.GetObjectsSize() - 1);
+    auto& entity_context = des[rand_food(rng)];
+    m_Points = entity_context["points"].GetAs<int>(0);
+    m_Texture.LoadTexture(CAppSettings::instance().get_SourceFolder() + entity_context["texture_path"].GetAs<std::string>(0));
+    
+    m_Texture.SetRect<SourceRect>({0,0},TextureSize(40,40));
+    m_Texture.SetRect({0,0},m_TextureSize);
+  }
   m_TimeStamp.Start();
-}
-
-bool Food::isColliding(const EntityPosition &pos) {
-  return (m_Position.x == pos.x && m_Position.y == pos.y) ? true : false;
 }

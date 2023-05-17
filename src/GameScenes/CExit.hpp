@@ -7,11 +7,10 @@ public:
   ~CExit();
 
   void OnCreate() override;
-  void BeforeDestruction() override;
   void OnDestroy() override;
 
   void InputHandler() override;
-  void Update() override;
+  void Update(float dt) override;
   void Render() override;
 
 private:

@@ -2,55 +2,58 @@
 
 CPlaying::CPlaying()
 {
-  m_pFoodFlyweight = std::make_shared<FoodFlyweight>();
+  m_FoodVec.reserve(6);
+  m_FoodVec.resize(6,Food());
 
-  const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
-  std::string food_texture_path;
-
-  food_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "food" + symbol + "apple.png";
-  m_pFoodFlyweight->AddFood(FoodName::APPLE, FoodType::Edible, 6, food_texture_path);
-
-  food_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "food" + symbol + "water_melon.png";
-  m_pFoodFlyweight->AddFood(FoodName::WATER_MELON, FoodType::Edible, 6, food_texture_path);
-
-  food_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "food" + symbol + "star_fruit.png";
-  m_pFoodFlyweight->AddFood(FoodName::STAR_FRUIT, FoodType::Edible, 10, food_texture_path);
-
-  food_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "food" + symbol + "burger.png";
-  m_pFoodFlyweight->AddFood(FoodName::BURGER, FoodType::InEdible, 8, food_texture_path);
-
-  food_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "food" + symbol + "hotdog.png";
-  m_pFoodFlyweight->AddFood(FoodName::HOTDOG, FoodType::InEdible, 3, food_texture_path);
-
-  food_texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "food" + symbol + "steak.png";
-  m_pFoodFlyweight->AddFood(FoodName::STEAK, FoodType::InEdible, 2, food_texture_path);
-
-  m_Snake.set_MapState(m_Map.get_MapState());
-
-  for (short int i = 0; i < FOOD_SIZE; i++)
-  {
-    m_food[i].set_MapState(m_Map.get_MapState());
-
-    m_food[i].set_FoodFlyweight(m_pFoodFlyweight);
+  for(auto& food : m_FoodVec){
+    food.RespawnNewFood();
+    m_EntityList.push_back(std::ref(food));
   }
 
   m_CollideSystem.AddObserver(&m_GameScore);
   m_GameScore.AddObserver(&m_AchievementSystem);
+
+  m_EntityList.push_back(std::ref(m_Snake));
+
+  Resize();
+
+  std::random_device dev;
+  std::mt19937 rng(dev());
+  std::uniform_int_distribution<std::mt19937::result_type> random(0,4);
+
+  std::string src_path = CAppSettings::instance().get_SourceFolder();
+
+  const std::string explosions_path[5] = {
+    {src_path + CAppSettings::instance().GetCorrectedPath("/assets/explosions/round_explosion/spritesheet/spritesheet.png")},
+    {src_path + CAppSettings::instance().GetCorrectedPath("/assets/explosions/round_vortex/spritesheet/spritesheet.png")},
+    {src_path + CAppSettings::instance().GetCorrectedPath("/assets/explosions/vertical_explosion/spritesheet/spritesheet.png")},
+    {src_path + CAppSettings::instance().GetCorrectedPath("/assets/explosions/vertical_explosion_small/spritesheet/spritesheet.png")},
+    {src_path + CAppSettings::instance().GetCorrectedPath("/assets/explosions/X_plosion/spritesheet/spritesheet.png")},
+  };
+
+  m_ExplosionPool.ForEach([&random,&rng,&explosions_path](TextureAnimation* animated_texture){
+    animated_texture->LoadSpriteSheet(explosions_path[random(rng)],{9,8});
+    animated_texture->SetFrameSize(TextureSize(100,100));
+    animated_texture->SetTextureSize(TextureSize(32,32));
+  });
+  
 }
 
 CPlaying::~CPlaying() {}
 
 void CPlaying::OnCreate()
 {
+  SDL_SetRenderDrawColor(CSDLContext::instance().get_renderer(),250,63,7,255);
+  
   m_StartToFinishTimestamp.Start();
 
   m_GameScore.OnCreate();
   m_Map.OnCreate();
   m_Snake.OnCreate();
 
-  for (short int i = 0; i < FOOD_SIZE; i++)
+  for (auto& food : m_FoodVec)
   {
-    m_food[i].RespawnNewFood();
+    food.RespawnNewFood();
   }
 }
 
@@ -68,8 +71,7 @@ void CPlaying::OnDestroy()
   double time_in_game = m_StartToFinishTimestamp.GetDurationInSeconds();
   m_InGameTimeStack.push_front(time_in_game / 60);
 
-  const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
-  std::string file_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CMatchHistory" + symbol + "CMatchHistory-Data.cfg";
+  std::string file_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/GameScenes/CMatchHistory/CMatchHistory-Data.cfg");
 
   Serializer des;
   if(Serializer::Deserialize(des,file_path)){
@@ -79,7 +81,7 @@ void CPlaying::OnDestroy()
     int write_index = 0;
 
     for(auto it = m_InGameTimeStack.begin(); it != m_InGameTimeStack.end();it++,write_index++){
-      time_property.set_Double(*it,write_index);
+      time_property.SetAs<double>(*it,write_index);
     }
   
     Serializer::Serialize(des,file_path);
@@ -88,7 +90,7 @@ void CPlaying::OnDestroy()
 
 void CPlaying::InputHandler()
 {
-  if (SDL_PollEvent(&m_event))
+  while (SDL_PollEvent(&m_event))
   {
     switch (m_event.type)
     {
@@ -102,16 +104,16 @@ void CPlaying::InputHandler()
       switch (m_event.key.keysym.sym)
       {
       case SDLK_LEFT:
-        m_Snake.set_MoveDir(MoveDir::LEFT);
+        m_Snake.set_MoveDir(Vec2(-1,0));
         break;
       case SDLK_RIGHT:
-         m_Snake.set_MoveDir(MoveDir::RIGHT);
+        m_Snake.set_MoveDir(Vec2(1,0));
         break;
       case SDLK_UP:
-        m_Snake.set_MoveDir(MoveDir::UP);
+        m_Snake.set_MoveDir(Vec2(0,-1));
         break;
       case SDLK_DOWN:
-        m_Snake.set_MoveDir(MoveDir::DOWN);
+        m_Snake.set_MoveDir(Vec2(0,1));
         break;
       case SDLK_r:
       {
@@ -126,20 +128,49 @@ void CPlaying::InputHandler()
       } // !switch m_event.key.keysym.sym
       break;
     }
+
+    case SDL_WINDOWEVENT:{
+    switch(m_event.window.event){
+        case SDL_WINDOWEVENT_RESIZED:{
+          Resize();
+          break;
+        }
+      }
+      break;
+    }//! SDL_WINDOW_EVENT
+
     } // !switch
   }
   m_Snake.InputHandler();
 }
 
-void CPlaying::Update()
+void CPlaying::Update(float dt)
 {
-  m_Snake.Update();
-  for (short int i = 0; i < FOOD_SIZE; i++)
-  {
-    m_food[i].Update();
+  m_ExplosionsInUse.erase(std::remove_if(m_ExplosionsInUse.begin(),m_ExplosionsInUse.end(),[&](auto& info){
+    if(info.resource->IsFinished()){
+      info.resource->Refresh();
+      m_ExplosionPool.ReturnResource(info);
+      return true;
+    }
+    return false;
+  }),m_ExplosionsInUse.end());
 
-    if (m_CollideSystem.IsColliding(m_Snake, m_food[i]))
+  for(auto& info : m_ExplosionsInUse){
+    info.resource->MoveFrameForward();
+  }
+  
+  m_Snake.Update(dt);
+  for (auto& food : m_FoodVec)
+  {
+    food.Update(dt);
+    auto prev_texture_pos = food.GetTexture().GetTexturePosition();
+    if (m_CollideSystem.IsColliding(m_Snake, food))
     {
+      auto& explosion = m_ExplosionPool.GetResource();
+
+      explosion.resource->SetPosition(prev_texture_pos);
+
+      m_ExplosionsInUse.push_back(explosion);
       m_Snake.GrowBody();
     }
   }
@@ -150,25 +181,47 @@ void CPlaying::Update()
 
 void CPlaying::Render()
 {
-  for (short int i = 0; i < FOOD_SIZE; i++)
-  {
-    m_food[i].Render();
-  }
   m_Map.Render();
-  m_Snake.Render();
+
+
+  for(auto& entity : m_EntityList){
+    Map::RenderEntity(entity);
+  }
+
+  for(auto& explosion : m_ExplosionsInUse){
+    explosion.resource->Render();
+  }
+
   m_GameScore.Render();
   m_AchievementSystem.Render();
 }
 
 void CPlaying::TakeAndSaveScreenShot()
 {
-  const std::string &symbol = CAppSettings::instance().get_SlashSymbol();
   std::string texture_path;
-  texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "GameScenes" + symbol + "CPause" + symbol;
-  std::string filename = "background.bmp";
-  SDL_Surface *sshot = SDL_CreateRGBSurface(0, CAppSettings::instance().get_WindowWidth(), CAppSettings::instance().get_WindowHeight(), 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+  texture_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/GameScenes/CPause/background.bmp");
+  int win_w{},win_h{};
+
+  SDL_GetWindowSize(CSDLContext::instance().get_window(),&win_w,&win_h);
+
+  SDL_Surface *sshot = SDL_CreateRGBSurface(0, win_w,win_h, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
   SDL_RenderReadPixels(CSDLContext::instance().get_renderer(), NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
 
-  SDL_SaveBMP(sshot, (texture_path + filename).c_str());
+  SDL_SaveBMP(sshot, (texture_path).c_str());
   SDL_FreeSurface(sshot);
+}
+
+void CPlaying::Resize()
+{
+  m_Map.OnResize();
+
+  for(auto& entity : m_EntityList){
+    entity.get().SetSize(m_Map.GetTextureSize());
+  }
+
+  m_ExplosionPool.ForEach([&](TextureAnimation* animated_texture){
+    animated_texture->SetTextureSize(m_Map.GetTextureSize());
+  });
+
+  m_GameScore.OnResize();
 }

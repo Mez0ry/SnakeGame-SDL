@@ -1,1 +1,0 @@
-add_library(FontManager SHARED FontManager.hpp FontManager.cpp)

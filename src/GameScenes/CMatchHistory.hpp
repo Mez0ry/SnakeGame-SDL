@@ -2,14 +2,16 @@
 #define SnakeGame_GameScenes_CSTATS_HPP
 #include "../CAppSettings/CAppSettings.hpp"
 #include "../CSDLContext/CSDLContext.hpp"
-#include "../TextureManager/TextureManager.hpp"
-#include "../FontManager/FontManager.hpp"
+#include "../Texture/Texture.hpp"
 #include "GameScene.hpp"
 #include <climits>
-#include "ScenesUtils/DataField/DataField.hpp"
-#include "ScenesUtils/InertialScroll/InertialScroll.hpp"
-#include <queue>
+#include "../GUI/Text/Text.hpp"
+#include "../GUI/UIElements/Datafield.hpp"
+#include "../GUI/UIElements/ProgressBar.hpp"
+#include "../GUI/InertialScroll/InertialScroll.hpp"
 #include "../Serializer/Serializer.hpp"
+#include "../Vector.hpp"
+#include <vector>
 
 class CMatchHistory : public GameScene
 {
@@ -18,26 +20,27 @@ public:
     ~CMatchHistory();
 
     void OnCreate() override;
-    void BeforeDestruction() override;
     void OnDestroy() override;
-
+    
     void InputHandler() override;
-    void Update() override;
+    void Update(float dt) override;
     void Render() override;
 
 private:
-    TextureManager m_ReturnButton;
-    TextureManager m_BackgroundTexture;
-    TextureManager m_MatchBoardTexture;
-
+    Texture m_ReturnButton;
+    Texture m_BackgroundTexture;
+    Texture m_MatchBoardTexture;
+    Texture m_DataFieldTexture;
+    
+    ProgressBar m_ProgressBar;
+    Text m_ProgressText; // In percents
+    Text m_PercentSymbolText;
+    int m_CurrentExperience;
+    int m_TotalExperience;
     InertialScroll m_InertialScroll;
-    DataField *m_DataFields;
-    std::queue<int> m_ScoreQueue;
-    std::queue<double> m_InGameTime;
-
-    int m_FieldsSize = 0;
-private:
-    template <typename std::size_t Row_Size, typename std::size_t Col_Size>
-    constexpr int ClosestTextureResolution(int texture_resolution_arr[Row_Size][Col_Size], int row, int col);
+    
+    std::vector<Datafield> m_DataFields;
+    std::vector<int> m_ScoreVec;
+    std::vector<double> m_InGameTimeVec;
 };
 #endif //! SnakeGame_GameScenes_CSTATS_HPP

@@ -17,10 +17,10 @@ public:
   /**
    * @brief Used to do some operations before destruction
   */
-  virtual void BeforeDestruction() = 0;
+  virtual void BeforeDestruction(){}
   virtual void OnDestroy() = 0;
   virtual void InputHandler() = 0;
-  virtual void Update() = 0;
+  virtual void Update(float dt) = 0;
   virtual void Render() = 0;
   /**
    * @brief Ignores the call to the OnDestroy method if the scene at the time of transition is not equal to the type of scene obtained from this method

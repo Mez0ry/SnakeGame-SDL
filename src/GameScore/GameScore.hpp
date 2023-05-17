@@ -1,7 +1,7 @@
 #ifndef SnakeGame_GAME_SCORE_HPP
 #define SnakeGame_GAME_SCORE_HPP
-#include "../FontManager/FontManager.hpp"
-#include "../TextureManager/TextureManager.hpp"
+#include "../GUI/Text/Text.hpp"
+#include "../Texture/Texture.hpp"
 
 #include "../Observer/Observer.hpp"
 #include "../Food/Food.hpp"
@@ -12,13 +12,13 @@
 #include "../Serializer/Serializer.hpp"
 
 class GameScore : public Observer, public Subject{
-private:
-  TextureManager m_BackTexture;
 public:
   GameScore();
   ~GameScore();
   void OnCreate();
   void OnDestroy();
+  void OnResize();
+
   void onNotify(const Entity& entity, ObserverEvents event) override;
 
   void Update();
@@ -47,7 +47,9 @@ public:
 private:
   /** @brief contains score for every game client played*/
   std::list<int> m_GamesScore;
-  FontManager m_FontManager;
+  Text m_ScoreText;
+  Texture m_ScoreBarTexture;
+  
   SDL_Color m_ScoreColor = {255, 255, 255, 255};
   int m_Score;
 };

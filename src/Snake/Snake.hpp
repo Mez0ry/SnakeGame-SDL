@@ -3,17 +3,12 @@
 #include "../CSDLContext/CSDLContext.hpp"
 #include "../Map.hpp"
 #include "SDL2/SDL.h"
-#include "SnakeModel.hpp"
 
 /** SnakeBody*/
 #include "SnakeBody.hpp"
-
-#include "SnakeCommands/MoveTo.hpp"
-
+#include "../GameScenes/GameScene.hpp"
 
 class Snake : public Entity {
-private:
-  SquareType **m_MapState;
 public:
   Snake();
   ~Snake();
@@ -22,25 +17,53 @@ public:
   void OnDestroy();
 
   void InputHandler();
-  void Update();
-  void Render();
+  void Update(float dt);
+
+  void OnRender() override;
 
   bool isPlayer() const override { return true; }
-
-  void set_MapState(SquareType **map_state) { this->m_MapState = map_state; m_MoveToCommand.set_MapState(map_state); }
-  void set_MoveDir(MoveDir dir) {
-    m_MoveDir = dir;
+ 
+  void set_MoveDir(const Vec2& dir_vec) {
+    m_DirectionVec = dir_vec;
   }
 
   void GrowBody(){
     m_SnakeBody.AddLength();
   }
 
-  const EntityPosition &get_PositionOnMap() const override {return m_Model.m_SnakePosition;}
+   void SetPosition(const Vec2 &pos) override{
+    m_SnakePosition = pos;
+  }
+
+  const Vec2& GetPosition() const override{
+    return m_SnakePosition;
+  }
+
+  void SetSize(const TextureSize &size){
+    for(int i = 0;i<4;i++){
+      m_SnakeTextures[i].SetTextureSize(size);
+    }
+    m_Texture.SetTextureSize(size);
+    m_SnakeBody.GetTexture().SetTextureSize(size);
+  }
+  
+  const TextureSize GetSize() const{
+    return m_Texture.GetTextureSize();
+  }
+  
+  Texture& GetTexture(){
+    return m_Texture;
+  }
+  
 private:
+  Texture m_Texture; // Texture that will be rendered
   SnakeBody m_SnakeBody;
-  SnakeModel m_Model;
-  MoveDir m_MoveDir;
-  MoveTo m_MoveToCommand;
+  Vec2 m_SnakePosition;
+  Vec2 m_PrevSnakePosition;
+
+  Vec2 m_DirectionVec;
+  int m_ScalarVelocity;
+
+  Texture m_SnakeTextures[4]; //Preloaded textures
 };
 #endif //! SnakeGame_SNAKE_HPP

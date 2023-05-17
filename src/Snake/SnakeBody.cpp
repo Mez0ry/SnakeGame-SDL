@@ -2,15 +2,18 @@
 
 SnakeBody::SnakeBody() : m_CurrSize(1)
 {
-    const std::string& symbol = CAppSettings::instance().get_SlashSymbol();
-    std::string texture_path = CAppSettings::instance().get_SourceFolder() + symbol + "assets" + symbol + "snake" + symbol + "body.png";
+    std::string texture_path = CAppSettings::instance().get_SourceFolder() + CAppSettings::GetCorrectedPath("/assets/snake/body.png");
     m_SnakeBodyTexture.LoadTexture(texture_path);
-    m_SnakeBodyTexture.set_srcRect(0, 0, 32, 32);
+    m_SnakeBodyTexture.SetTexturePosition<SourceRect>({0,0});
+    m_SnakeBodyTexture.SetTexturePosition({0,0});
+
+    m_SnakeBodyTexture.SetTextureSize<SourceRect>(TextureSize(40, 40));
+    m_SnakeBodyTexture.SetTextureSize(TextureSize(32, 32));
 }
 
 SnakeBody::~SnakeBody()
 {
-    m_SnakeBodyTexture.DestroyTexture();
+
 }
 
 void SnakeBody::AddLength()
@@ -19,41 +22,30 @@ void SnakeBody::AddLength()
         m_CurrSize++;
 }
 
-void SnakeBody::Update(SquareType **map_state, EntityPosition &snake_position)
+void SnakeBody::Update(Vec2 &snake_position)
 {
-    this->m_MapState = map_state;
+    m_BodyDq.push_front(snake_position);
 
-    m_BodyPosition.x = snake_position.x * TextureConstants::TextureWidth;
-    m_BodyPosition.y = snake_position.y * TextureConstants::TextureHeight;
-    m_BodyPosition.w = m_BodyPosition.h = 32;
-    rq.push_front(m_BodyPosition);
-
-    while (rq.size() > m_CurrSize)
+    while (m_BodyDq.size() > m_CurrSize)
     {
-        map_state[rq.back().y / TextureConstants::TextureHeight][rq.back().x / TextureConstants::TextureWidth] = SquareType::BACKGROUND;
-        rq.pop_back();
+        m_BodyDq.pop_back();
     }
 
 }
 
 void SnakeBody::Render()
 {
-    for(int i = 0;i < rq.size(); i++){
+    for(int i = 0;i < m_BodyDq.size(); i++){
         if(i == 0) continue;
         
-        if (rq[i].y / TextureConstants::TextureHeight > CAppSettings::instance().get_MapHeight() || rq[i].x / TextureConstants::TextureWidth > CAppSettings::instance().get_MapWidth() || rq[i].y / TextureConstants::TextureHeight < 0 || rq[i].x / TextureConstants::TextureWidth < 0)
-        {
-            return;
+        if(Map::IsOnBoard(m_BodyDq[i])){
+            Map::RenderTextureAt(m_SnakeBodyTexture,m_BodyDq[i]);
         }
-        m_MapState[rq[i].y / TextureConstants::TextureHeight][rq[i].x / TextureConstants::TextureWidth] = SquareType::ENTITY;
-
-        m_SnakeBodyTexture.set_dstRect(MapUtils::CorrectWidthPosOnTheMap(rq[i].x / TextureConstants::TextureWidth), MapUtils::CorrectHeightPosOnTheMap(rq[i].y / TextureConstants::TextureHeight));
-        m_SnakeBodyTexture.RenderTexture();
     }
 }
 
 void SnakeBody::Reset()
 {
     m_CurrSize = 1;
-    rq.clear();
+    m_BodyDq.clear();
 }

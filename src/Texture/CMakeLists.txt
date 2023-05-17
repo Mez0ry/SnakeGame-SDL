@@ -1,0 +1,1 @@
+add_library(Texture SHARED Texture.hpp Texture.cpp)
