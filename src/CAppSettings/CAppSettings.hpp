@@ -22,6 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <unordered_map>
+#include <filesystem>
 
 #include "../Timestamp/Timestamp.hpp"
 #include "../Serializer/Serializer.hpp"
